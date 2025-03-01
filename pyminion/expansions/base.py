@@ -2,7 +2,7 @@ import logging
 import math
 from typing import TYPE_CHECKING
 
-from pyminion.core import AbstractDeck, CardType, Action, Card, ScoreCard, Treasure, Victory, plural
+from pyminion.core import AbstractDeck, CardType, Action, Card, Expansion, ScoreCard, Treasure, Victory, plural
 from pyminion.effects import AttackEffect, EffectAction, FuncPlayerCardGameEffect, FuncPlayerGameEffect, PlayerCardGameEffect
 from pyminion.player import Player
 
@@ -1252,31 +1252,34 @@ witch = Witch()
 workshop = Workshop()
 
 
-base_set: list[Card] = [
-    artisan,
-    bandit,
-    bureaucrat,
-    cellar,
-    chapel,
-    council_room,
-    festival,
-    gardens,
-    harbinger,
-    laboratory,
-    library,
-    market,
-    merchant,
-    militia,
-    mine,
-    moat,
-    moneylender,
-    poacher,
-    remodel,
-    sentry,
-    smithy,
-    throne_room,
-    vassal,
-    village,
-    witch,
-    workshop,
-]
+base_set = Expansion(
+    "Base",
+    [
+        artisan,
+        bandit,
+        bureaucrat,
+        cellar,
+        chapel,
+        council_room,
+        festival,
+        gardens,
+        harbinger,
+        laboratory,
+        library,
+        market,
+        merchant,
+        militia,
+        mine,
+        moat,
+        moneylender,
+        poacher,
+        remodel,
+        sentry,
+        smithy,
+        throne_room,
+        vassal,
+        village,
+        witch,
+        workshop,
+    ],
+)

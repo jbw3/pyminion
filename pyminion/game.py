@@ -3,7 +3,7 @@ import logging
 import random
 from typing import Iterator
 
-from pyminion.core import Card, DeckCounter, DiscardPile, Pile, Supply, Trash
+from pyminion.core import Card, DeckCounter, DiscardPile, Expansion, Pile, Supply, Trash
 from pyminion.effects import EffectRegistry
 from pyminion.exceptions import InvalidGameSetup, InvalidPlayerCount
 from pyminion.expansions.base import (copper, curse, duchy, estate, gold,
@@ -41,7 +41,7 @@ class Game:
     def __init__(
         self,
         players: list[Player],
-        expansions: list[list[Card]],
+        expansions: list[Expansion],
         kingdom_cards: list[Card]|None = None,
         start_deck: list[Card]|None = None,
         random_order: bool = True,
@@ -136,7 +136,7 @@ class Game:
         KINGDOM_PILES: int = 10
 
         # All available cards from chosen expansions
-        kingdom_options = [card for expansion in self.expansions for card in expansion]
+        kingdom_options = [card for expansion in self.expansions for card in expansion.kingdom_cards]
 
         # If user chooses kingdom cards, put them in the supply
         if self.kingdom_cards:

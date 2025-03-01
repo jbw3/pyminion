@@ -511,6 +511,24 @@ class Supply:
         return len(pile)
 
 
+class Expansion:
+    """
+    Contains the cards in an expansion.
+
+    """
+    def __init__(self, name: str, kingdom_cards: list[Card]):
+        self._name = name
+        self._kingdom_cards = kingdom_cards
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def kingdom_cards(self) -> list[Card]:
+        return self._kingdom_cards
+
+
 def plural(word: str, count: int) -> str:
     """
     Makes a word plural if needed based on the count.

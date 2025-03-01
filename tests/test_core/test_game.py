@@ -227,7 +227,7 @@ def test_include_potions(decider):
     game_no_potions = Game(
         players=[player1, player2],
         expansions=[base_set],
-        kingdom_cards=base_set[:10],
+        kingdom_cards=base_set.kingdom_cards[:10],
     )
     game_no_potions.start()
     assert not any(pile.name == "Potion" for pile in game_no_potions.supply.piles)
@@ -236,7 +236,7 @@ def test_include_potions(decider):
     game_potions = Game(
         players=[player1, player2],
         expansions=[alchemy_set],
-        kingdom_cards=alchemy_set[:10],
+        kingdom_cards=alchemy_set.kingdom_cards[:10],
     )
     game_potions.start()
     assert any(pile.name == "Potion" for pile in game_potions.supply.piles)

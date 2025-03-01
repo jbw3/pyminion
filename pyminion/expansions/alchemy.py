@@ -7,6 +7,7 @@ from pyminion.core import (
     Card,
     CardType,
     Cost,
+    Expansion,
     Treasure,
     Victory,
 )
@@ -655,17 +656,20 @@ university = University()
 vineyard = Vineyard()
 
 
-alchemy_set: list[Card] = [
-    alchemist,
-    apothecary,
-    apprentice,
-    familiar,
-    golem,
-    herbalist,
-    philosophers_stone,
-    possession,
-    scrying_pool,
-    transmute,
-    university,
-    vineyard,
-]
+alchemy_set = Expansion(
+    "Alchemy",
+    [
+        alchemist,
+        apothecary,
+        apprentice,
+        familiar,
+        golem,
+        herbalist,
+        philosophers_stone,
+        possession,
+        scrying_pool,
+        transmute,
+        university,
+        vineyard,
+    ],
+)

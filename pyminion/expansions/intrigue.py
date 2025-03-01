@@ -2,7 +2,7 @@ from enum import IntEnum, unique
 import logging
 from typing import TYPE_CHECKING, Any
 
-from pyminion.core import AbstractDeck, Action, Card, CardType, Treasure, Victory, get_score_cards
+from pyminion.core import AbstractDeck, Action, Card, CardType, Expansion, Treasure, Victory, get_score_cards
 from pyminion.player import Player
 from pyminion.effects import AttackEffect, EffectAction, FuncPlayerCardGameEffect
 from pyminion.expansions.base import curse, duchy, estate, gold, silver
@@ -1326,31 +1326,34 @@ upgrade = Upgrade()
 wishing_well = WishingWell()
 
 
-intrigue_set: list[Card] = [
-    baron,
-    bridge,
-    conspirator,
-    courtier,
-    courtyard,
-    diplomat,
-    duke,
-    farm,
-    ironworks,
-    lurker,
-    masquerade,
-    mill,
-    mining_village,
-    minion,
-    nobles,
-    patrol,
-    pawn,
-    replace,
-    secret_passage,
-    shanty_town,
-    steward,
-    swindler,
-    torturer,
-    trading_post,
-    upgrade,
-    wishing_well,
-]
+intrigue_set = Expansion(
+    "Intrigue",
+    [
+        baron,
+        bridge,
+        conspirator,
+        courtier,
+        courtyard,
+        diplomat,
+        duke,
+        farm,
+        ironworks,
+        lurker,
+        masquerade,
+        mill,
+        mining_village,
+        minion,
+        nobles,
+        patrol,
+        pawn,
+        replace,
+        secret_passage,
+        shanty_town,
+        steward,
+        swindler,
+        torturer,
+        trading_post,
+        upgrade,
+        wishing_well,
+    ],
+)
