@@ -11,6 +11,8 @@ PlayerGameEffectHandler = Callable[["Player", "Game"], None]
 PlayerGameEffectTriggerHandler = Callable[["Player", "Game"], bool]
 PlayerCardGameEffectHandler = Callable[["Player", "Card", "Game"], None]
 PlayerCardGameEffectTriggerHandler = Callable[["Player", "Card", "Game"], bool]
+PlayerCardGameDeckEffectHandler = Callable[["Player", "Card", "Game", "AbstractDeck"], None]
+PlayerCardGameDeckEffectTriggerHandler = Callable[["Player", "Card", "Game", "AbstractDeck"], bool]
 
 
 @unique
@@ -134,6 +136,34 @@ class PlayerCardGameDeckEffect(Effect):
 
     def handler(self, player: "Player", card: "Card", game: "Game", destination: "AbstractDeck") -> None:
         raise NotImplementedError("PlayerCardGameDeckEffect handler is not implemented")
+
+
+class FuncPlayerCardGameDeckEffect(PlayerCardGameDeckEffect):
+    def __init__(
+        self,
+        name: str,
+        action: EffectAction,
+        handler_func: PlayerCardGameDeckEffectHandler,
+        is_triggered_func: PlayerCardGameDeckEffectTriggerHandler | None = None,
+    ):
+        super().__init__(name)
+        self._action = action
+        self.handler_func = handler_func
+
+        self.is_triggered_func: PlayerCardGameDeckEffectTriggerHandler
+        if is_triggered_func is None:
+            self.is_triggered_func = lambda p, c, g, d: True
+        else:
+            self.is_triggered_func = is_triggered_func
+
+    def get_action(self) -> EffectAction:
+        return self._action
+
+    def is_triggered(self, player: "Player", card: "Card", game: "Game", deck: "AbstractDeck") -> bool:
+        return self.is_triggered_func(player, card, game, deck)
+
+    def handler(self, player: "Player", card: "Card", game: "Game", deck: "AbstractDeck") -> None:
+        self.handler_func(player, card, game, deck)
 
 
 class AttackEffect(Effect):
