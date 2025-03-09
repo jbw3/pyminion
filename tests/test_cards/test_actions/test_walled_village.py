@@ -1,5 +1,5 @@
-from pyminion.expansions.base import base_set, throne_room
-from pyminion.expansions.promos import promos_set, walled_village
+from pyminion.expansions.base import throne_room
+from pyminion.expansions.promos import walled_village
 from pyminion.game import Game
 from pyminion.human import Human
 

@@ -84,10 +84,14 @@ class Marchland(Victory):
         vp = count // 3
         return vp
 
-    def on_gain_trigger(self, player: Player, card: Card, game: "Game", deck: "AbstractDeck") -> bool:
+    def on_gain_trigger(
+        self, player: Player, card: Card, game: "Game", deck: "AbstractDeck"
+    ) -> bool:
         return card.name == self.name
 
-    def on_gain(self, player: Player, card: Card, game: "Game", deck: "AbstractDeck") -> None:
+    def on_gain(
+        self, player: Player, card: Card, game: "Game", deck: "AbstractDeck"
+    ) -> None:
         player.state.buys += 1
         if len(player.hand) > 0:
             discard_cards = player.decider.discard_decision(
@@ -198,7 +202,9 @@ class WalledVillage(Action):
 
         return count
 
-    def _play(self, player: Player, game: "Game", count: int, generic_play: bool = True) -> None:
+    def _play(
+        self, player: Player, game: "Game", count: int, generic_play: bool = True
+    ) -> None:
         super().play(player, game, generic_play)
 
         if count == 1:
@@ -222,7 +228,9 @@ class WalledVillage(Action):
             game.effect_registry.register_turn_end_effect(unregister_effect)
 
     def on_cleanup_trigger(self, player: Player, game: "Game") -> bool:
-        num_action_cards = sum(1 for c in player.playmat.cards if CardType.Action in c.type)
+        num_action_cards = sum(
+            1 for c in player.playmat.cards if CardType.Action in c.type
+        )
         return num_action_cards <= 2
 
     def on_cleanup(self, player: Player, game: "Game") -> None:

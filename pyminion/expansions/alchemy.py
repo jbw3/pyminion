@@ -1,5 +1,5 @@
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from pyminion.core import (
     AbstractDeck,
@@ -19,7 +19,6 @@ from pyminion.effects import (
 )
 from pyminion.expansions.base import duchy, gold
 from pyminion.player import Player
-from typing import Any
 
 if TYPE_CHECKING:
     from pyminion.game import Game
