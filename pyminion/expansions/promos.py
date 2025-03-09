@@ -15,6 +15,7 @@ from pyminion.effects import (
     EffectAction,
     FuncPlayerCardGameDeckEffect,
     FuncPlayerGameEffect,
+    PlayerCardGameEffect,
 )
 from pyminion.player import Player
 
@@ -33,7 +34,7 @@ class Envoy(Action):
     """
 
     def __init__(self):
-        super().__init__("Envoy", 4, (CardType.Action,))
+        super().__init__(name="Envoy", cost=4, type=(CardType.Action,))
 
     def play(self, player: Player, game: "Game", generic_play: bool = True) -> None:
 
@@ -113,6 +114,115 @@ class Marchland(Victory):
             self.on_gain_trigger,
         )
         game.effect_registry.register_gain_effect(effect)
+
+
+class Sauna(Action):
+    """
+    +1 Card
+    +1 Action
+
+    You may play an Avanto from your hand.
+    This turn, when you play a Silver, you may trash a card from your hand.
+
+    """
+
+    class TrashEffect(PlayerCardGameEffect):
+        def __init__(self, player: Player, card: Card):
+            super().__init__("Sauna: Trash")
+            self.player = player
+            self.card = card
+
+        def get_action(self) -> EffectAction:
+            return EffectAction.Other
+
+        def is_triggered(self, player: Player, card: Card, game: "Game") -> bool:
+            return (
+                player is self.player and card.name == "Silver" and len(player.hand) > 0
+            )
+
+        def handler(self, player: Player, card: Card, game: "Game") -> None:
+            trash_cards = player.decider.trash_decision(
+                "Enter card to trash (if desired): ",
+                self.card,
+                player.hand.cards,
+                player,
+                game,
+                min_num_trash=0,
+                max_num_trash=1,
+            )
+            assert 0 <= len(trash_cards) <= 1
+
+            if len(trash_cards) > 0:
+                trash_card = trash_cards[0]
+                player.trash(trash_card, game)
+
+            game.effect_registry.unregister_play_effect(self.get_id())
+
+    def __init__(self):
+        super().__init__(
+            name="Sauna", cost=4, type=(CardType.Action,), actions=1, draw=1
+        )
+
+    def play(self, player: Player, game: "Game", generic_play: bool = True) -> None:
+        super().play(player, game, generic_play)
+
+        avanto_cards = [c for c in player.hand if c.name == "Avanto"]
+        if len(avanto_cards) > 0:
+            play_avanto = player.decider.binary_decision(
+                "Do you want to play an Avanto? (y/n): ",
+                self,
+                player,
+                game,
+            )
+
+            if play_avanto:
+                avanto_card = avanto_cards[0]
+                player.hand.remove(avanto_card)
+                player.playmat.add(avanto_card)
+                player.exact_play(avanto_card, game, generic_play=False)
+
+        trash_effect = Sauna.TrashEffect(player, self)
+        game.effect_registry.register_play_effect(trash_effect)
+
+        unregister_effect = FuncPlayerGameEffect(
+            f"{self.name}: Unregister trash",
+            EffectAction.Last,
+            lambda p, g: g.effect_registry.unregister_play_effect(
+                trash_effect.get_id()
+            ),
+            lambda p, g: p is player,
+        )
+        game.effect_registry.register_turn_end_effect(unregister_effect)
+
+
+class Avanto(Action):
+    """
+    +3 Cards
+
+    You may play a Sauna from your hand.
+
+    """
+
+    def __init__(self):
+        super().__init__(name="Avanto", cost=5, type=(CardType.Action,), draw=3)
+
+    def play(self, player: Player, game: "Game", generic_play: bool = True) -> None:
+        super().play(player, game, generic_play)
+
+        sauna_cards = [c for c in player.hand if c.name == "Sauna"]
+        if len(sauna_cards) > 0:
+            play_sauna = player.decider.binary_decision(
+                "Do you want to play a Sauna? (y/n): ",
+                self,
+                player,
+                game,
+            )
+
+            if play_sauna:
+                sauna_card = sauna_cards[0]
+                player.hand.remove(sauna_card)
+                player.playmat.add(sauna_card)
+                player.exact_play(sauna_card, game, generic_play=False)
 
 
 class Stash(Treasure):
@@ -248,6 +358,8 @@ class WalledVillage(Action):
 
 envoy = Envoy()
 marchland = Marchland()
+sauna = Sauna()
+avanto = Avanto()
 stash = Stash()
 walled_village = WalledVillage()
 

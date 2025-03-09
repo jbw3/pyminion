@@ -89,6 +89,8 @@ from pyminion.expansions.promos import (
     envoy,
     marchland,
     promos_set,
+    sauna,
+    avanto,
     stash,
     walled_village,
 )
@@ -1235,6 +1237,27 @@ def test_marchland_bot(bot: OptimizedBot, game: Game):
 
     assert len(bot.hand) == 1
     assert bot.hand.cards[0].name == "Copper"
+
+
+def test_sauna_avanto(bot: OptimizedBot, game: Game):
+    bot.deck.add(estate)
+    bot.deck.add(copper)
+    bot.deck.add(silver)
+    bot.deck.add(sauna)
+    bot.deck.add(avanto)
+
+    bot.hand.add(sauna)
+    assert len(bot.hand) == 1
+    assert len(game.trash) == 0
+
+    bot.play(sauna, game)
+    assert len(bot.hand) == 3
+    assert len(game.trash) == 0
+
+    bot.play(silver, game)
+    assert len(bot.hand) == 0
+    assert len(game.trash) == 2
+    assert set(c.name for c in game.trash) == {"Copper", "Estate"}
 
 
 @pytest.mark.expansions([base_set, promos_set])

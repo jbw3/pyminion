@@ -179,6 +179,10 @@ class OptimizedBotDecider(BotDecider):
             return self.scrying_pool(prompt, player, game, relevant_cards)
         elif card.name == "University":
             return self.university_binary(player, game, relevant_cards)
+        elif card.name == "Sauna":
+            return self.sauna_binary(player, game, relevant_cards)
+        elif card.name == "Avanto":
+            return self.avanto(player, game, relevant_cards)
         elif card.name == "Walled Village":
             return self.walled_village(player, game, relevant_cards)
         else:
@@ -319,6 +323,8 @@ class OptimizedBotDecider(BotDecider):
         elif card.name == "Transmute":
             ret = self.transmute(player, game, valid_cards)
             return [ret]
+        elif card.name == "Sauna":
+            return self.sauna_trash(player, game, valid_cards)
         else:
             return super().trash_decision(prompt, card, valid_cards, player, game, min_num_trash, max_num_trash)
 
@@ -1664,6 +1670,31 @@ class OptimizedBotDecider(BotDecider):
         valid_cards: list[Card],
     ) -> list[Card]:
         return self.get_optional_discard(valid_cards, player)
+
+    def sauna_binary(
+        self,
+        player: "Player",
+        game: "Game",
+        valid_cards: list[Card]|None,
+    ) -> bool:
+        return True
+
+    def sauna_trash(
+        self,
+        player: "Player",
+        game: "Game",
+        valid_cards: list[Card],
+    ) -> list[Card]:
+        trash_cards = self.determine_trash_cards(valid_cards, player, game, required=False)
+        return trash_cards[:1]
+
+    def avanto(
+        self,
+        player: "Player",
+        game: "Game",
+        valid_cards: list[Card]|None,
+    ) -> bool:
+        return True
 
     def stash(
         self,
