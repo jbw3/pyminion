@@ -257,6 +257,9 @@ class OptimizedBotDecider(BotDecider):
             return self.tide_pools(player, game, valid_cards=valid_cards, num_discard=min_num_discard)
         elif card.name == "Warehouse":
             return self.warehouse(player, game, valid_cards=valid_cards, num_discard=min_num_discard)
+        elif card.name == "Envoy":
+            ret = self.envoy(player, game, valid_cards)
+            return [ret]
         elif card.name == "Marchland":
             return self.marchland(player, game, valid_cards)
         else:
@@ -1642,6 +1645,17 @@ class OptimizedBotDecider(BotDecider):
     ) -> Card:
         card = max(valid_cards, key=lambda c: c.get_cost(player, game))
         return card
+
+    def envoy(
+        self,
+        player: "Player",
+        game: "Game",
+        valid_cards: list[Card],
+    ) -> Card:
+        sorted_cards = self.sort_for_discard(valid_cards, player.state.actions, player, game)
+        # reverse so we will discard our opponent's best card
+        sorted_cards.reverse()
+        return sorted_cards[0]
 
     def marchland(
         self,

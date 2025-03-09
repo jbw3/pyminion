@@ -2,6 +2,7 @@ import logging
 from typing import TYPE_CHECKING, Any
 
 from pyminion.core import (
+    AbstractDeck,
     Action,
     Card,
     CardType,
@@ -18,11 +19,51 @@ from pyminion.effects import (
 from pyminion.player import Player
 
 if TYPE_CHECKING:
-    from pyminion.core import AbstractDeck
     from pyminion.game import Game
 
 
 logger = logging.getLogger()
+
+
+class Envoy(Action):
+    """
+    Reveal the top 5 cards of your deck. The player to your left chooses one.
+    Discard that one and put the rest into your hand.
+
+    """
+
+    def __init__(self):
+        super().__init__("Envoy", 4, (CardType.Action,))
+
+    def play(self, player: Player, game: "Game", generic_play: bool = True) -> None:
+
+        super().play(player, game, generic_play)
+
+        revealed = AbstractDeck()
+        player.draw(5, revealed, silent=True)
+        player.reveal(revealed, game)
+
+        if len(revealed) == 0:
+            return
+
+        if len(revealed) == 1:
+            discard_card = revealed.cards[0]
+        else:
+            left_player = game.get_left_player(player)
+            discard_cards = left_player.decider.discard_decision(
+                f"Enter a card for {player.player_id} to discard: ",
+                self,
+                revealed.cards,
+                player,
+                game,
+                min_num_discard=1,
+                max_num_discard=1,
+            )
+            assert len(discard_cards) == 1
+            discard_card = discard_cards[0]
+
+        player.discard(game, discard_card, revealed)
+        revealed.move_to(player.hand)
 
 
 class Marchland(Victory):
@@ -197,6 +238,7 @@ class WalledVillage(Action):
             logger.info(f"{player} topdecks {self.name}")
 
 
+envoy = Envoy()
 marchland = Marchland()
 stash = Stash()
 walled_village = WalledVillage()
@@ -205,6 +247,7 @@ walled_village = WalledVillage()
 promos_set = Expansion(
     "Promos",
     [
+        envoy,
         marchland,
         stash,
         walled_village,

@@ -86,6 +86,7 @@ from pyminion.expansions.alchemy import (
     university,
 )
 from pyminion.expansions.promos import (
+    envoy,
     marchland,
     promos_set,
     stash,
@@ -1204,6 +1205,24 @@ def test_university_bot(bot: OptimizedBot, game: Game):
     bot.play(university, game)
     assert len(bot.discard_pile) == 1
     assert CardType.Action in bot.discard_pile.cards[0].type
+
+
+def test_envoy_bot(multiplayer_bot_game: Game):
+    bot = multiplayer_bot_game.players[0]
+
+    bot.deck.add(copper)
+    bot.deck.add(silver)
+    bot.deck.add(gold)
+    bot.deck.add(estate)
+    bot.deck.add(duchy)
+
+    bot.hand.cards.clear()
+    bot.hand.add(envoy)
+    bot.play(envoy, multiplayer_bot_game)
+    assert len(bot.hand) == 4
+    assert set(c.name for c in bot.hand) == {"Copper", "Silver", "Estate", "Duchy"}
+    assert len(bot.discard_pile) == 1
+    assert bot.discard_pile.cards[0].name == "Gold"
 
 
 @pytest.mark.expansions([base_set, promos_set])
