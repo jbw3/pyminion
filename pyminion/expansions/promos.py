@@ -1,7 +1,8 @@
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from pyminion.core import (
+    Action,
     Card,
     CardType,
     Expansion,
@@ -122,8 +123,83 @@ class Stash(Treasure):
         game.effect_registry.register_shuffle_effect(effect)
 
 
+class WalledVillage(Action):
+    """
+    +1 Card, +2 Actions
+
+    At the start of Clean-up, if you have this and no more than one other
+    Action card in play, you may put this onto your deck.
+
+    """
+
+    def __init__(self):
+        super().__init__(
+            name="Walled Village", cost=4, type=(CardType.Action,), actions=2, draw=1
+        )
+
+    def play(self, player: Player, game: "Game", generic_play: bool = True) -> None:
+        self._play(player, game, 1, generic_play)
+
+    def multi_play(
+        self,
+        player: Player,
+        game: "Game",
+        multi_play_card: Card,
+        state: Any,
+        generic_play: bool = True,
+    ) -> Any:
+        if state is None:
+            count = 1
+        else:
+            count = int(state) + 1
+
+        self._play(player, game, count, generic_play)
+
+        return count
+
+    def _play(self, player: Player, game: "Game", count: int, generic_play: bool = True) -> None:
+        super().play(player, game, generic_play)
+
+        if count == 1:
+            cleanup_effect = FuncPlayerGameEffect(
+                "Walled Village: Topdeck",
+                EffectAction.Other,
+                self.on_cleanup,
+                self.on_cleanup_trigger,
+            )
+            game.effect_registry.register_cleanup_phase_start_effect(cleanup_effect)
+
+            cleanup_effect_id = cleanup_effect.get_id()
+            unregister_effect = FuncPlayerGameEffect(
+                f"{self.name}: Unregister Topdeck Effect",
+                EffectAction.Last,
+                lambda p, g: g.effect_registry.unregister_cleanup_phase_start_effect(
+                    cleanup_effect_id
+                ),
+                lambda p, g: p is player,
+            )
+            game.effect_registry.register_turn_end_effect(unregister_effect)
+
+    def on_cleanup_trigger(self, player: Player, game: "Game") -> bool:
+        num_action_cards = sum(1 for c in player.playmat.cards if CardType.Action in c.type)
+        return num_action_cards <= 2
+
+    def on_cleanup(self, player: Player, game: "Game") -> None:
+        topdeck = player.decider.binary_decision(
+            prompt=f"Topdeck {self.name}? y/n: ",
+            card=self,
+            player=player,
+            game=game,
+        )
+        if topdeck:
+            player.playmat.remove(self)
+            player.deck.add(self)
+            logger.info(f"{player} topdecks {self.name}")
+
+
 marchland = Marchland()
 stash = Stash()
+walled_village = WalledVillage()
 
 
 promos_set = Expansion(
@@ -131,5 +207,6 @@ promos_set = Expansion(
     [
         marchland,
         stash,
+        walled_village,
     ],
 )

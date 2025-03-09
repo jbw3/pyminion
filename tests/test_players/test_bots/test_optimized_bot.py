@@ -89,6 +89,7 @@ from pyminion.expansions.promos import (
     marchland,
     promos_set,
     stash,
+    walled_village,
 )
 from pyminion.game import Game
 import pytest
@@ -1229,3 +1230,13 @@ def test_stash_bot(multiplayer_bot_game: Game):
     for _ in range(10):
         bot.deck.shuffle()
         assert bot.deck.cards[-1].name == "Stash"
+
+
+def test_walled_village_bot(multiplayer_bot_game: Game):
+    bot = multiplayer_bot_game.players[0]
+
+    bot.hand.add(walled_village)
+    bot.play(walled_village, multiplayer_bot_game)
+    bot.start_cleanup_phase(multiplayer_bot_game)
+
+    assert sum(1 for c in bot.hand if c.name == "Walled Village") == 1

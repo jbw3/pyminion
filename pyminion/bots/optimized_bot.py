@@ -179,6 +179,8 @@ class OptimizedBotDecider(BotDecider):
             return self.scrying_pool(prompt, player, game, relevant_cards)
         elif card.name == "University":
             return self.university_binary(player, game, relevant_cards)
+        elif card.name == "Walled Village":
+            return self.walled_village(player, game, relevant_cards)
         else:
             return super().binary_decision(prompt, card, player, game, relevant_cards)
 
@@ -1658,6 +1660,13 @@ class OptimizedBotDecider(BotDecider):
         # put stashes on top
         return num_deck_cards
 
+    def walled_village(
+        self,
+        player: "Player",
+        game: "Game",
+        valid_cards: list[Card]|None,
+    ) -> bool:
+        return True
 
 class OptimizedBot(Bot):
     """
