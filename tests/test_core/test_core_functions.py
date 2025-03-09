@@ -13,6 +13,9 @@ def test_plural():
     assert plural("card", 1) == "card"
     assert plural("card", 2) == "cards"
 
+    assert plural("stash", 1) == "stash"
+    assert plural("stash", 2) == "stashes"
+
 
 def test_get_action_cards():
     cards_in = [

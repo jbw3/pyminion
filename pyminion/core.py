@@ -537,7 +537,12 @@ def plural(word: str, count: int) -> str:
     if count == 1:
         return word
 
-    return word + "s"
+    if word[-2:] == "sh":
+        end = "es"
+    else:
+        end = "s"
+
+    return word + end
 
 
 def get_action_cards(cards: Iterable[Card]) -> Iterator[Action]:

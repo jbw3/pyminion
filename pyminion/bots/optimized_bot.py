@@ -411,6 +411,8 @@ class OptimizedBotDecider(BotDecider):
     ) -> int:
         if card.name == "Secret Passage":
             return self.secret_passage(player, game, num_deck_cards=num_deck_cards, pos=True)
+        elif card.name == "Stash":
+            return self.stash(player, game, num_deck_cards)
         else:
             return super().deck_position_decision(prompt, card, player, game, num_deck_cards)
 
@@ -1640,12 +1642,21 @@ class OptimizedBotDecider(BotDecider):
         return card
 
     def marchland(
-            self,
-            player: "Player",
-            game: "Game",
-            valid_cards: list[Card],
+        self,
+        player: "Player",
+        game: "Game",
+        valid_cards: list[Card],
     ) -> list[Card]:
         return self.get_optional_discard(valid_cards, player)
+
+    def stash(
+        self,
+        player: "Player",
+        game: "Game",
+        num_deck_cards: int,
+    ) -> int:
+        # put stashes on top
+        return num_deck_cards
 
 
 class OptimizedBot(Bot):

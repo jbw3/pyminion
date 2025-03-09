@@ -88,6 +88,7 @@ from pyminion.expansions.alchemy import (
 from pyminion.expansions.promos import (
     marchland,
     promos_set,
+    stash,
 )
 from pyminion.game import Game
 import pytest
@@ -1214,3 +1215,17 @@ def test_marchland_bot(bot: OptimizedBot, game: Game):
 
     assert len(bot.hand) == 1
     assert bot.hand.cards[0].name == "Copper"
+
+
+@pytest.mark.expansions([base_set, promos_set])
+@pytest.mark.kingdom_cards([stash])
+def test_stash_bot(multiplayer_bot_game: Game):
+    bot = multiplayer_bot_game.players[0]
+
+    bot.deck.add(stash)
+
+    # shuffle multiple times to make sure the bot actually puts the stash on top
+    # instead of it randomly ending up on top
+    for _ in range(10):
+        bot.deck.shuffle()
+        assert bot.deck.cards[-1].name == "Stash"
