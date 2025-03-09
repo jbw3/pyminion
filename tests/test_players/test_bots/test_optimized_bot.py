@@ -85,6 +85,10 @@ from pyminion.expansions.alchemy import (
     transmute,
     university,
 )
+from pyminion.expansions.promos import (
+    marchland,
+    promos_set,
+)
 from pyminion.game import Game
 import pytest
 
@@ -1198,3 +1202,15 @@ def test_university_bot(bot: OptimizedBot, game: Game):
     bot.play(university, game)
     assert len(bot.discard_pile) == 1
     assert CardType.Action in bot.discard_pile.cards[0].type
+
+
+@pytest.mark.expansions([base_set, promos_set])
+@pytest.mark.kingdom_cards([marchland])
+def test_marchland_bot(bot: OptimizedBot, game: Game):
+    bot.hand.add(estate)
+    bot.hand.add(copper)
+
+    bot.gain(marchland, game)
+
+    assert len(bot.hand) == 1
+    assert bot.hand.cards[0].name == "Copper"
