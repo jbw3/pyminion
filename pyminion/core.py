@@ -516,16 +516,18 @@ class Expansion:
     Contains the cards in an expansion.
 
     """
-    def __init__(self, name: str, kingdom_cards: list[Card]):
+    def __init__(self, name: str, kingdom_cards: list[Card|list[Card]]):
         self._name = name
-        self._kingdom_cards = kingdom_cards
+        self._kingdom_cards = [
+            [c] if isinstance(c, Card) else c for c in kingdom_cards
+        ]
 
     @property
     def name(self) -> str:
         return self._name
 
     @property
-    def kingdom_cards(self) -> list[Card]:
+    def kingdom_cards(self) -> list[list[Card]]:
         return self._kingdom_cards
 
 

@@ -194,6 +194,9 @@ class Sauna(Action):
         )
         game.effect_registry.register_turn_end_effect(unregister_effect)
 
+    def get_pile_starting_count(self, game: "Game") -> int:
+        return 5
+
 
 class Avanto(Action):
     """
@@ -223,6 +226,9 @@ class Avanto(Action):
                 player.hand.remove(sauna_card)
                 player.playmat.add(sauna_card)
                 player.exact_play(sauna_card, game, generic_play=False)
+
+    def get_pile_starting_count(self, game: "Game") -> int:
+        return 5
 
 
 class Stash(Treasure):
@@ -369,6 +375,7 @@ promos_set = Expansion(
     [
         envoy,
         marchland,
+        [sauna, avanto],
         stash,
         walled_village,
     ],

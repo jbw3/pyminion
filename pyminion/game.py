@@ -42,7 +42,7 @@ class Game:
         self,
         players: list[Player],
         expansions: list[Expansion],
-        kingdom_cards: list[Card]|None = None,
+        kingdom_cards: list[Card|list[Card]]|None = None,
         start_deck: list[Card]|None = None,
         random_order: bool = True,
         log_stdout: bool = True,
@@ -57,7 +57,9 @@ class Game:
         self.players = players
         self.current_player = self.players[0]
         self.expansions = expansions
-        self.kingdom_cards = [] if kingdom_cards is None else kingdom_cards
+        self.kingdom_cards = [] if kingdom_cards is None else [
+            [c] if isinstance(c, Card) else c for c in kingdom_cards
+        ]
         self.all_game_cards: list[Card] = []
         self.card_cost_reduction = 0
         self.start_deck = start_deck
@@ -127,6 +129,14 @@ class Game:
 
         return basic_piles
 
+    def _create_pile(self, pile_cards: list[Card]) -> Pile:
+        all_pile_cards: list[Card] = []
+        for card in pile_cards:
+            all_pile_cards += [card] * card.get_pile_starting_count(self)
+
+        pile = Pile(all_pile_cards)
+        return pile
+
     def _create_kingdom_piles(self) -> list[Pile]:
         """
         Create the kingdom piles that vary from kingdom to kingdom.
@@ -135,33 +145,37 @@ class Game:
         """
         KINGDOM_PILES: int = 10
 
-        # All available cards from chosen expansions
-        kingdom_options = [card for expansion in self.expansions for card in expansion.kingdom_cards]
+        chosen_names: set[str] = set()
+        chosen_piles: list[Pile] = []
+        for cards in self.kingdom_cards:
+            pile = self._create_pile(cards)
+            name = "/".join(c.name for c in cards)
+            chosen_names.add(name)
+            chosen_piles.append(pile)
 
-        # If user chooses kingdom cards, put them in the supply
-        if self.kingdom_cards:
-            if invalid_cards := [
-                card for card in self.kingdom_cards if card not in kingdom_options
-            ]:
-                raise InvalidGameSetup(
-                    f"Invalid game setup: {invalid_cards} not in provided expansions"
-                )
-            chosen_cards = len(self.kingdom_cards)
+        # Available cards from chosen expansions that can be randomly chosen
+        option_names: set[str] = set()
+        kingdom_options: list[list[Card]] = []
+        for expansion in self.expansions:
+            for pile_cards in expansion.kingdom_cards:
+                name = "/".join(c.name for c in pile_cards)
+                option_names.add(name)
 
-        else:
-            chosen_cards = 0
+                # Do not duplicate any user chosen cards
+                if name not in chosen_names:
+                    kingdom_options.append(pile_cards)
 
-        chosen_piles = (
-            [Pile([card] * card.get_pile_starting_count(self)) for card in self.kingdom_cards]
-            if chosen_cards
-            else []
-        )
+        invalid_names = chosen_names.difference(option_names)
+        if len(invalid_names) > 0:
+            names_str = ", ".join(invalid_names)
+            raise InvalidGameSetup(
+                f"Invalid game setup: {names_str} not in provided expansions"
+            )
+
         # The rest of the supply is random cards
-        if chosen_cards:
-            for card in self.kingdom_cards:
-                kingdom_options.remove(card)  # Do not duplicate any user chosen cards
-        kingdom_ten = random.sample(kingdom_options, KINGDOM_PILES - chosen_cards)
-        random_piles = [Pile([card] * card.get_pile_starting_count(self)) for card in kingdom_ten]
+        num_chosen_piles = len(chosen_piles)
+        random_options = random.sample(kingdom_options, KINGDOM_PILES - num_chosen_piles)
+        random_piles = [self._create_pile(cards) for cards in random_options]
 
         piles = chosen_piles + random_piles
 
