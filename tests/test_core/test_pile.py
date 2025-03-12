@@ -24,3 +24,17 @@ def test_draw_empty_pile():
     assert len(pile) == 0
     with pytest.raises(EmptyPile):
         pile.remove(copper)
+
+
+def test_get_top_pile():
+    pile = Pile([estate, copper])
+    assert len(pile) == 2
+
+    assert pile.get_top().name == "Estate"
+    assert len(pile) == 2
+
+    pile.remove(estate)
+    assert len(pile) == 1
+
+    assert pile.get_top().name == "Copper"
+    assert len(pile) == 1
