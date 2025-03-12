@@ -4,7 +4,7 @@ import logging
 import random
 from typing import TYPE_CHECKING, Any, Callable, Iterable, Iterator
 
-from pyminion.exceptions import EmptyPile, InsufficientActions, PileNotFound
+from pyminion.exceptions import CardNotFound, EmptyPile, InsufficientActions, PileNotFound
 
 if TYPE_CHECKING:
     from pyminion.game import Game
@@ -395,8 +395,21 @@ class Pile(AbstractDeck):
     def remove(self, card: Card) -> Card:
         if len(self.cards) < 1:
             raise EmptyPile(f"{self.name} pile is empty, cannot gain card")
+        if card.name != self.cards[0].name:
+            raise CardNotFound(f"Cannot gain {card.name} as it is not the top card of the pile")
+
         super().remove(card)
         return card
+
+    def get_top(self) -> Card:
+        """
+        Returns the top card of the pile without removing it.
+
+        """
+        if len(self.cards) < 1:
+            raise EmptyPile(f"{self.name} pile is empty, cannot get top card")
+
+        return self.cards[0]
 
 
 class Playmat(AbstractDeck):
