@@ -435,7 +435,7 @@ class Lurker(Action):
             assert len(trash_cards) == 1
             trash_card = trash_cards[0]
 
-            pile = game.supply.get_pile(trash_card.name)
+            pile = game.supply.get_pile_by_card(trash_card.name)
             player.trash(trash_card, game, pile)
 
         elif choice == Lurker.Choice.GainAction:

@@ -877,7 +877,7 @@ class OptimizedBotDecider(BotDecider):
         valid_cards: list[Card],
     ) -> Card:
         best_victory = self.get_best_victory_card(valid_cards, player)
-        if game.supply.pile_length(pile_name="Province") < 3 and best_victory is not None:
+        if game.supply.pile_length(card_name="Province") < 3 and best_victory is not None:
             return best_victory
         else:
             return silver
@@ -1393,7 +1393,7 @@ class OptimizedBotDecider(BotDecider):
         valid_cards: list[Card],
     ) -> Card:
         best_victory = self.get_best_victory_card(valid_cards, player)
-        if game.supply.pile_length(pile_name="Province") < 3 and best_victory is not None:
+        if game.supply.pile_length(card_name="Province") < 3 and best_victory is not None:
             return best_victory
         return silver
 

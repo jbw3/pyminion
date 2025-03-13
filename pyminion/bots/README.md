@@ -87,7 +87,7 @@ class WorkshopBot(OptimizedBot):
 
 ```python
     def workshop(self, player: "Player", game: "Game") -> Card:
-        if game.supply.pile_length(pile_name="Province") < 3:
+        if game.supply.pile_length(card_name="Province") < 3:
             return estate
         else:
             return silver

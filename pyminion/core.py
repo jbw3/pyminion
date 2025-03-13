@@ -482,12 +482,23 @@ class Supply:
                 return pile
         raise PileNotFound(f"{pile_name} pile is not valid")
 
+    def get_pile_by_card(self, card_name: str) -> Pile:
+        """
+        Get a pile by the name of one of its cards.
+
+        """
+        for pile in self.piles:
+            for card in pile.unique_cards:
+                if card.name == card_name:
+                    return pile
+        raise PileNotFound(f"No piles for {card_name} card")
+
     def gain_card(self, card: Card) -> Card:
         """
         Gain a card from the supply.
 
         """
-        pile = self.get_pile(card.name)
+        pile = self.get_pile_by_card(card.name)
         try:
             return pile.remove(card)
 
@@ -499,12 +510,12 @@ class Supply:
         Return a card to the supply.
 
         """
-        pile = self.get_pile(card.name)
+        pile = self.get_pile_by_card(card.name)
         pile.add(card)
 
     def available_cards(self) -> list[Card]:
         """
-        Returns a list containing a single card from each non-empty pile in the supply.
+        Returns a list containing the top card from each non-empty pile in the supply.
 
         """
         cards = [pile.get_top() for pile in self.piles if pile]
@@ -521,12 +532,12 @@ class Supply:
                 empty_piles += 1
         return empty_piles
 
-    def pile_length(self, pile_name: str) -> int:
+    def pile_length(self, card_name: str) -> int:
         """
         Get the number of cards in a specified pile in the supply.
 
         """
-        pile = self.get_pile(pile_name)
+        pile = self.get_pile_by_card(card_name)
         return len(pile)
 
 

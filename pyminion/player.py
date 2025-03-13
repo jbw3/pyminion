@@ -281,7 +281,7 @@ class Player:
         if destination is None:
             destination = self.discard_pile
         if source is None:
-            source = game.supply.get_pile(card.name)
+            source = game.supply.get_pile_by_card(card.name)
 
         if self.possessing_player is None:
             gain_card = source.remove(card)

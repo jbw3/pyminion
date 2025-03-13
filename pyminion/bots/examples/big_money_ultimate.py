@@ -30,7 +30,7 @@ class BigMoneyUltimateDecider(BotDecider):
     def buy_priority(self, player: "Player", game: "Game") -> Iterator["Card"]:
         money = player.state.money
         deck_money = player.get_deck_money()
-        num_province = game.supply.pile_length(pile_name="Province")
+        num_province = game.supply.pile_length(card_name="Province")
         num_smithy = player.get_card_count(card=smithy)
         num_treasure = len(
             [card for card in player.get_all_cards() if CardType.Treasure in card.type]

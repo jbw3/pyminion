@@ -34,33 +34,33 @@ def test_game_create_supply(game: Game):
 def test_setup_1_player(human: Human):
     game = Game(players=[human], expansions=[base_set])
     game.supply = game._create_supply()
-    assert game.supply.pile_length(pile_name="Curse") == 10
-    assert game.supply.pile_length(pile_name="Province") == 5
-    assert game.supply.pile_length(pile_name="Copper") == 53
+    assert game.supply.pile_length(card_name="Curse") == 10
+    assert game.supply.pile_length(card_name="Province") == 5
+    assert game.supply.pile_length(card_name="Copper") == 53
 
 
 def test_setup_2_players(human: Human):
     game = Game(players=[human, human], expansions=[base_set])
     game.supply = game._create_supply()
-    assert game.supply.pile_length(pile_name="Curse") == 10
-    assert game.supply.pile_length(pile_name="Province") == 8
-    assert game.supply.pile_length(pile_name="Copper") == 46
+    assert game.supply.pile_length(card_name="Curse") == 10
+    assert game.supply.pile_length(card_name="Province") == 8
+    assert game.supply.pile_length(card_name="Copper") == 46
 
 
 def test_setup_3_players(human: Human):
     game = Game(players=[human, human, human], expansions=[base_set])
     game.supply = game._create_supply()
-    assert game.supply.pile_length(pile_name="Curse") == 20
-    assert game.supply.pile_length(pile_name="Province") == 12
-    assert game.supply.pile_length(pile_name="Copper") == 39
+    assert game.supply.pile_length(card_name="Curse") == 20
+    assert game.supply.pile_length(card_name="Province") == 12
+    assert game.supply.pile_length(card_name="Copper") == 39
 
 
 def test_setup_4_players(human: Human):
     game = Game(players=[human, human, human, human], expansions=[base_set])
     game.supply = game._create_supply()
-    assert game.supply.pile_length(pile_name="Curse") == 30
-    assert game.supply.pile_length(pile_name="Province") == 12
-    assert game.supply.pile_length(pile_name="Copper") == 32
+    assert game.supply.pile_length(card_name="Curse") == 30
+    assert game.supply.pile_length(card_name="Province") == 12
+    assert game.supply.pile_length(card_name="Copper") == 32
 
 
 def test_setup_user_selected_card(human):

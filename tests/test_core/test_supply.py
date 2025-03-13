@@ -2,6 +2,7 @@ import pytest
 from pyminion.core import Card, CardType, Pile, Supply
 from pyminion.exceptions import EmptyPile, PileNotFound
 from pyminion.expansions.base import copper, duchy, estate, gold, province, silver
+from pyminion.expansions.promos import sauna, avanto
 
 
 def test_create_supply():
@@ -48,7 +49,7 @@ def test_pile_not_found(supply: Supply):
 
 
 def test_return_card(supply: Supply):
-    estate_pile = supply.get_pile("Estate")
+    estate_pile = supply.get_pile_by_card("Estate")
     assert len(estate_pile) == 8
 
     card = supply.gain_card(estate)
@@ -90,6 +91,34 @@ def test_empty_piles(supply: Supply):
 
 
 def test_pile_length(supply: Supply):
-    assert supply.pile_length(pile_name="Province") == 8
+    assert supply.pile_length(card_name="Province") == 8
     supply.gain_card(card=province)
-    assert supply.pile_length(pile_name="Province") == 7
+    assert supply.pile_length(card_name="Province") == 7
+
+
+def test_get_pile():
+    sauna_avanto_cards: list[Card] = []
+    sauna_avanto_cards += [sauna] * 5
+    sauna_avanto_cards += [avanto] * 5
+    sauna_avanto_pile = Pile(sauna_avanto_cards)
+    supply = Supply([], [], [sauna_avanto_pile])
+
+    pile = supply.get_pile("Sauna/Avanto")
+    assert pile.name == "Sauna/Avanto"
+    assert pile.get_top().name == "Sauna"
+
+
+def test_get_pile_by_card():
+    sauna_avanto_cards: list[Card] = []
+    sauna_avanto_cards += [sauna] * 5
+    sauna_avanto_cards += [avanto] * 5
+    sauna_avanto_pile = Pile(sauna_avanto_cards)
+    supply = Supply([], [], [sauna_avanto_pile])
+
+    pile1 = supply.get_pile_by_card("Sauna")
+    assert pile1.name == "Sauna/Avanto"
+    assert pile1.get_top().name == "Sauna"
+
+    pile2 = supply.get_pile_by_card("Avanto")
+    assert pile2.name == "Sauna/Avanto"
+    assert pile2.get_top().name == "Sauna"

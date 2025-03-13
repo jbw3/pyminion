@@ -38,7 +38,7 @@ class BanditBotDecider(OptimizedBotDecider):
 
         money = player.state.money
         deck_money = player.get_deck_money()
-        num_province = game.supply.pile_length(pile_name="Province")
+        num_province = game.supply.pile_length(card_name="Province")
         num_smithy = player.get_card_count(card=smithy)
         num_bandit = player.get_card_count(card=bandit)
         num_treasure = len(

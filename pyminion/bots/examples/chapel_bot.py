@@ -27,7 +27,7 @@ class ChapelBotDecider(OptimizedBotDecider):
 
         money = player.state.money
         deck_money = player.get_deck_money()
-        num_province = game.supply.pile_length(pile_name="Province")
+        num_province = game.supply.pile_length(card_name="Province")
         num_chapel = player.get_card_count(card=chapel)
 
         if num_chapel < 1 and money >= 2:
