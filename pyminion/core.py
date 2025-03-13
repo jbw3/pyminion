@@ -456,9 +456,12 @@ class Supply:
         s = f"{count_str:>4}"
         if len(pile) == 0:
             s += "  $-"
+            name = pile.name
         else:
-            s += f" {pile.get_top().get_cost(player, game):>3}"
-        s += f" {pile.name:{name_padding}}"
+            top_card = pile.get_top()
+            s += f" {top_card.get_cost(player, game):>3}"
+            name = top_card.name
+        s += f" {name:{name_padding}}"
         return s
 
     def get_pretty_string(self, player: "Player", game: "Game") -> str:
