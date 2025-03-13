@@ -382,6 +382,7 @@ class Pile(AbstractDeck):
         super().__init__(cards)
         assert len(cards) > 0
 
+        self._unique_cards: list[Card] = []
         all_names: set[str] = set()
         unique_names: list[str] = []
         for card in cards:
@@ -389,8 +390,13 @@ class Pile(AbstractDeck):
             if name not in all_names:
                 unique_names.append(name)
                 all_names.add(name)
+                self._unique_cards.append(card)
 
         self.name = "/".join(unique_names)
+
+    @property
+    def unique_cards(self) -> list[Card]:
+        return self._unique_cards
 
     def remove(self, card: Card) -> Card:
         if len(self.cards) < 1:
@@ -451,7 +457,7 @@ class Supply:
         if len(pile) == 0:
             s += "  $-"
         else:
-            s += f" {pile.cards[0].get_cost(player, game):>3}"
+            s += f" {pile.get_top().get_cost(player, game):>3}"
         s += f" {pile.name:{name_padding}}"
         return s
 
@@ -501,7 +507,7 @@ class Supply:
         Returns a list containing a single card from each non-empty pile in the supply.
 
         """
-        cards = [pile.cards[0] for pile in self.piles if pile]
+        cards = [pile.get_top() for pile in self.piles if pile]
         return cards
 
     def num_empty_piles(self) -> int:

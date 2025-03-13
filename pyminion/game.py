@@ -118,9 +118,10 @@ class Game:
         ]
 
         for pile in kingdom_piles:
-            if pile.cards[0].base_cost.potions > 0:
-                basic_cards.insert(0, potion)
-                break
+            for card in pile.unique_cards:
+                if card.base_cost.potions > 0:
+                    basic_cards.insert(0, potion)
+                    break
 
         basic_piles = [
             Pile([card] * card.get_pile_starting_count(self))
@@ -180,7 +181,7 @@ class Game:
         piles = chosen_piles + random_piles
 
         def pile_sort(pile: Pile) -> tuple[int, int, str]:
-            cost = pile.cards[0].base_cost
+            cost = pile.get_top().base_cost
             return (cost.money, cost.potions, pile.name)
 
         # sort piles by cost and name
@@ -200,7 +201,7 @@ class Game:
         basic_score_piles = self._create_basic_score_piles()
         basic_treasure_piles = self._create_basic_treasure_piles(kingdom_piles)
         all_piles = basic_score_piles + basic_treasure_piles + kingdom_piles
-        self.all_game_cards = [pile.cards[0] for pile in all_piles]
+        self.all_game_cards = [card for pile in all_piles for card in pile.unique_cards]
         return Supply(basic_score_piles, basic_treasure_piles, kingdom_piles)
 
     def start(self) -> None:
