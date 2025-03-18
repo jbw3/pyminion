@@ -156,8 +156,6 @@ class Sauna(Action):
                 trash_card = trash_cards[0]
                 player.trash(trash_card, game)
 
-            game.effect_registry.unregister_play_effect(self.get_id())
-
     def __init__(self):
         super().__init__(
             name="Sauna", cost=4, type=(CardType.Action,), actions=1, draw=1
