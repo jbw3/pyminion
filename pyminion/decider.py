@@ -12,6 +12,9 @@ class Decider(Protocol):
 
     """
 
+    def start_turn(self, player: "Player", game: "Game") -> None:
+        pass
+
     def action_phase_decision(
         self,
         valid_actions: list["Card"],
@@ -25,7 +28,7 @@ class Decider(Protocol):
         valid_treasures: list["Card"],
         player: "Player",
         game: "Game",
-    ) -> list["Card"]:
+    ) -> "Card|None":
         raise NotImplementedError("treasure_phase_decision is not implemented")
 
     def buy_phase_decision(

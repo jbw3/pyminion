@@ -24,6 +24,9 @@ class BotDecider:
 
     """
 
+    def start_turn(self, player: "Player", game: "Game") -> None:
+        pass
+
     def action_priority(self, player: "Player", game: "Game") -> Iterator[Card]:
         """
         Add logic for playing action cards through this method
@@ -51,8 +54,10 @@ class BotDecider:
         valid_treasures: list[Card],
         player: "Player",
         game: "Game",
-    ) -> list[Card]:
-        return valid_treasures
+    ) -> Card|None:
+        if len(valid_treasures) > 0:
+            return valid_treasures[0]
+        return None
 
     def buy_priority(self, player: "Player", game: "Game") -> Iterator[Card]:
         """

@@ -390,6 +390,7 @@ class Player:
         if len(self.playmat) > 0:
             logger.info(f"{self.player_id}'s cards in play: {self.playmat}")
 
+        self.decider.start_turn(self, game)
         game.effect_registry.on_turn_start(self, game)
 
     def start_action_phase(self, game: "Game") -> None:
@@ -415,14 +416,12 @@ class Player:
         while len(viable_treasures) > 0:
             logger.info(f"Hand: {self.hand}")
 
-            cards = self.decider.treasure_phase_decision(viable_treasures, self, game)
-            if len(cards) == 0:
+            card = self.decider.treasure_phase_decision(viable_treasures, self, game)
+            if card is None:
                 break
 
-            for card in cards:
-                self.exact_play(card, game)
-            cards_str = ", ".join([str(c) for c in cards])
-            logger.info(f"{self.player_id} played {cards_str}")
+            self.exact_play(card, game)
+            logger.info(f"{self.player_id} plays {card.name}")
 
             viable_treasures = [card for card in self.hand.cards if CardType.Treasure in card.type]
 

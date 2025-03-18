@@ -233,10 +233,12 @@ def test_action_decision(base_bot: Bot, game: Game):
 
 def test_treasure_decision(base_bot: Bot, game: Game):
     treasures: list[Card] = [copper, gold]
-    cards = base_bot.decider.treasure_phase_decision(treasures, base_bot, game)
-    assert len(cards) == 2
-    assert treasures[0] == copper
-    assert treasures[1] == gold
+    card = base_bot.decider.treasure_phase_decision(treasures, base_bot, game)
+    assert card is not None
+    assert card.name == "Copper"
+
+    card = base_bot.decider.treasure_phase_decision([], base_bot, game)
+    assert card is None
 
 
 def test_buy_decision(base_bot: Bot, game: Game):

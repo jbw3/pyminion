@@ -31,6 +31,9 @@ def pytest_configure(config):
 
 
 class TestDecider:
+    def start_turn(self, player: "Player", game: "Game") -> None:
+        pass
+
     def buy_phase_decision(
         self,
         valid_cards: list[Card],

@@ -273,6 +273,11 @@ class HumanDecider:
     Prompts human for decisions through the terminal.
 
     """
+    def __init__(self):
+        self._treasure_cards: list[Card] = []
+
+    def start_turn(self, player: "Player", game: "Game") -> None:
+        self._treasure_cards.clear()
 
     @validate_input(exceptions=InvalidSingleCardInput)
     def action_phase_decision(
@@ -294,13 +299,21 @@ class HumanDecider:
         valid_treasures: list[Card],
         player: "Player",
         game: "Game",
-    ) -> list[Card]:
-        cards = multiple_card_decision(
-            prompt="Choose treasures to play: ",
-            valid_cards=valid_treasures,
-            allow_all=True,
-        )
-        return cards
+    ) -> Card|None:
+        if len(self._treasure_cards) == 0:
+            self._treasure_cards = multiple_card_decision(
+                prompt="Choose treasures to play: ",
+                valid_cards=valid_treasures,
+                allow_all=True,
+            )
+
+        valid_names = set(c.name for c in valid_treasures)
+        while len(self._treasure_cards) > 0 and self._treasure_cards[0].name not in valid_names:
+            self._treasure_cards.pop(0)
+
+        if len(self._treasure_cards) == 0:
+            return None
+        return self._treasure_cards.pop(0)
 
     @validate_input(exceptions=InvalidSingleCardInput)
     def buy_phase_decision(

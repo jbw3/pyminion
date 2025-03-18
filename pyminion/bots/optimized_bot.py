@@ -137,6 +137,9 @@ class OptimizedBotDecider(BotDecider):
         trash_cards = [x[1] for x in prioritized_cards]
         return trash_cards
 
+    def start_turn(self, player: "Player", game: "Game") -> None:
+        pass
+
     def binary_decision(
         self,
         prompt: str,
