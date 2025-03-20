@@ -7,6 +7,7 @@ from pyminion.exceptions import InvalidBotImplementation
 from pyminion.expansions.base import duchy, estate, curse, gold, silver, copper
 from pyminion.expansions.intrigue import Baron, Courtier, Lurker, Minion, Nobles, Pawn, Steward, Torturer
 from pyminion.expansions.seaside import NativeVillage
+from pyminion.expansions.promos import Governor
 from pyminion.player import Player
 
 if TYPE_CHECKING:
@@ -182,6 +183,8 @@ class OptimizedBotDecider(BotDecider):
             return self.scrying_pool(prompt, player, game, relevant_cards)
         elif card.name == "University":
             return self.university_binary(player, game, relevant_cards)
+        elif card.name == "Governor":
+            return self.governor_binary(player, game)
         elif card.name == "Sauna":
             return self.sauna_binary(player, game, relevant_cards)
         elif card.name == "Avanto":
@@ -227,6 +230,9 @@ class OptimizedBotDecider(BotDecider):
             return [ret]
         elif card.name == "Golem":
             ret = self.golem(player, game)
+            return [ret]
+        elif card.name == "Governor":
+            ret = self.governor_option(player, game)
             return [ret]
         else:
             return super().multiple_option_decision(card, options, player, game, num_choices, unique)
@@ -326,6 +332,9 @@ class OptimizedBotDecider(BotDecider):
         elif card.name == "Transmute":
             ret = self.transmute(player, game, valid_cards)
             return [ret]
+        elif card.name == "Governor":
+            ret = self.governor_trash(player, game, valid_cards)
+            return [ret]
         elif card.name == "Sauna":
             return self.sauna_trash(player, game, valid_cards)
         else:
@@ -379,6 +388,9 @@ class OptimizedBotDecider(BotDecider):
             return [ret]
         elif card.name == "University":
             ret = self.university_gain(player, game, valid_cards)
+            return [ret]
+        elif card.name == "Governor":
+            ret = self.governor_gain(player, game, valid_cards)
             return [ret]
         else:
             return super().gain_decision(prompt, card, valid_cards, player, game, min_num_gain, max_num_gain)
@@ -1665,6 +1677,44 @@ class OptimizedBotDecider(BotDecider):
         # reverse so we will discard our opponent's best card
         sorted_cards.reverse()
         return sorted_cards[0]
+
+    def governor_option(
+        self,
+        player: "Player",
+        game: "Game",
+    ) -> int:
+        trash_cards = self.determine_trash_cards(player.hand.cards, player, game, required=False)
+        if len(trash_cards) > 0:
+            return Governor.Choice.TrashGain
+
+        if not any(c.name == "Gold" for c in player.get_all_cards()):
+            return Governor.Choice.GainTreasure
+
+        return Governor.Choice.Draw
+
+    def governor_binary(
+        self,
+        player: Player,
+        game: "Game",
+    ) -> bool:
+        return True
+
+    def governor_trash(
+        self,
+        player: "Player",
+        game: "Game",
+        valid_cards: list[Card],
+    ) -> Card:
+        trash_cards = self.determine_trash_cards(valid_cards, player, game, required=True)
+        return trash_cards[0]
+
+    def governor_gain(
+        self,
+        player: Player,
+        game: "Game",
+        valid_cards: list[Card],
+    ) -> Card:
+        return valid_cards[0]
 
     def marchland(
         self,

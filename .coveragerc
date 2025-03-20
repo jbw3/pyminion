@@ -4,6 +4,7 @@ omit = tests*, pyminion/bots/examples*
 [report]
 exclude_lines =
     if TYPE_CHECKING:
+    case _:
     raise NotImplementedError
     raise*
     \.\.\.

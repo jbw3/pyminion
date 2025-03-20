@@ -1,3 +1,4 @@
+from enum import IntEnum, unique
 import logging
 from typing import TYPE_CHECKING, Any
 
@@ -18,6 +19,7 @@ from pyminion.effects import (
     PlayerCardGameEffect,
 )
 from pyminion.player import Player
+from pyminion.expansions.base import gold, silver
 
 if TYPE_CHECKING:
     from pyminion.game import Game
@@ -65,6 +67,112 @@ class Envoy(Action):
 
         player.discard(game, discard_card, revealed)
         revealed.move_to(player.hand)
+
+
+class Governor(Action):
+    """
+    +1 Action
+
+    Choose one; you get the version in parentheses: Each player gets +1 (+3) Cards;
+    or each player gains a Silver (Gold); or each player may trash a card from their
+    hand and gain a card costing exactly $1 ($2) more.
+
+    """
+
+    @unique
+    class Choice(IntEnum):
+        Draw = 0
+        GainTreasure = 1
+        TrashGain = 2
+
+    def __init__(self):
+        super().__init__(name="Governor", cost=5, type=(CardType.Action,), actions=1)
+
+    def play(self, player: Player, game: "Game", generic_play: bool = True) -> None:
+
+        super().play(player, game, generic_play)
+
+        options = [
+            "+3 cards (opponents +1 card)",
+            "Gain Gold (opponents gain Silver)",
+            "Trash a card and gain a card costing $2 more (opponents trash and gain $1 more)",
+        ]
+        choices = player.decider.multiple_option_decision(
+            card=self,
+            options=options,
+            player=player,
+            game=game,
+        )
+        assert len(choices) == 1
+        choice = choices[0]
+
+        match choice:
+            case Governor.Choice.Draw:
+                player.draw(3)
+                for opponent in game.get_opponents(player):
+                    opponent.draw(1)
+            case Governor.Choice.GainTreasure:
+                player.try_gain(gold, game)
+                for opponent in game.get_opponents(player):
+                    opponent.try_gain(silver, game)
+            case Governor.Choice.TrashGain:
+                self._trash_option(player, game, 2)
+                for opponent in game.get_opponents(player):
+                    self._trash_option(opponent, game, 1)
+            case _:
+                raise ValueError(f"Unknown governor choice '{choice}'")
+
+    def _trash_option(self, player: Player, game: "Game", increase: int) -> None:
+        if len(player.hand) == 0:
+            return
+
+        trash = player.decider.binary_decision(
+            prompt="Would you like to trash a card from your hand?",
+            card=self,
+            player=player,
+            game=game,
+        )
+
+        if not trash:
+            return
+
+        trash_cards = player.decider.trash_decision(
+            prompt="Choose a card from your hand to trash",
+            card=self,
+            valid_cards=player.hand.cards,
+            player=player,
+            game=game,
+            min_num_trash=1,
+            max_num_trash=1,
+        )
+        assert len(trash_cards) == 1
+        trash_card = trash_cards[0]
+
+        player.trash(trash_card, game)
+
+        cost = trash_card.get_cost(player, game) + increase
+        valid_cards = [
+            card
+            for card in game.supply.available_cards()
+            if card.get_cost(player, game) == cost
+        ]
+        if len(valid_cards) == 0:
+            return
+
+        gain_cards = player.decider.gain_decision(
+            prompt=f"Gain a card costing exactly {cost}: ",
+            card=self,
+            valid_cards=valid_cards,
+            player=player,
+            game=game,
+            min_num_gain=1,
+            max_num_gain=1,
+        )
+        assert len(gain_cards) == 1
+        gain_card = gain_cards[0]
+        assert gain_card.get_cost(player, game) == cost
+
+        player.gain(gain_card, game)
 
 
 class Marchland(Victory):
@@ -361,6 +469,7 @@ class WalledVillage(Action):
 
 
 envoy = Envoy()
+governor = Governor()
 marchland = Marchland()
 sauna = Sauna()
 avanto = Avanto()
@@ -372,6 +481,7 @@ promos_set = Expansion(
     "Promos",
     [
         envoy,
+        governor,
         marchland,
         [sauna, avanto],
         stash,

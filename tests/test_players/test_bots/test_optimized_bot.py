@@ -87,6 +87,7 @@ from pyminion.expansions.alchemy import (
 )
 from pyminion.expansions.promos import (
     envoy,
+    governor,
     marchland,
     promos_set,
     sauna,
@@ -1225,6 +1226,25 @@ def test_envoy_bot(multiplayer_bot_game: Game):
     assert set(c.name for c in bot.hand) == {"Copper", "Silver", "Estate", "Duchy"}
     assert len(bot.discard_pile) == 1
     assert bot.discard_pile.cards[0].name == "Gold"
+
+
+def test_governor_bot(multiplayer_bot_game: Game):
+    bot = multiplayer_bot_game.players[0]
+
+    bot.hand.cards.clear()
+    bot.hand.add(curse)
+
+    for _ in range(3):
+        bot.hand.add(governor)
+
+    assert len(bot.hand) == 4
+    assert len(bot.discard_pile) == 0
+
+    for _ in range(3):
+        bot.play(governor, multiplayer_bot_game)
+
+    assert len(bot.hand) == 3
+    assert len(bot.discard_pile) == 2
 
 
 @pytest.mark.expansions([base_set, promos_set])
