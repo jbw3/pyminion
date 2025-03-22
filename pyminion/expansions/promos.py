@@ -12,11 +12,13 @@ from pyminion.core import (
     Victory,
     plural,
 )
+from pyminion.duration import ActionDuration
 from pyminion.effects import (
     EffectAction,
     FuncPlayerCardGameDeckEffect,
     FuncPlayerGameEffect,
     PlayerCardGameEffect,
+    PlayerGameEffect,
 )
 from pyminion.player import Player
 from pyminion.expansions.base import gold, silver
@@ -26,6 +28,97 @@ if TYPE_CHECKING:
 
 
 logger = logging.getLogger()
+
+
+class Church(ActionDuration):
+    """
+    +1 Action
+
+    Set aside up to 3 cards from your hand face down. At the start of your next
+    turn, put them into your hand, then you may trash a card from your hand.
+
+    """
+
+    class GetCardsTrashEffect(PlayerGameEffect):
+        def __init__(self, playing_card: Card, player: Player, cards: list[Card]):
+            cards_str = plural("card", len(cards))
+            super().__init__(f"Church: Put {cards_str} in hand and trash")
+            self.playing_card = playing_card
+            self.player = player
+            self.cards = cards
+
+        def get_action(self) -> EffectAction:
+            return EffectAction.HandAddRemoveCards
+
+        def is_triggered(self, player: Player, game: "Game") -> bool:
+            return player is self.player
+
+        def handler(self, player: Player, game: "Game") -> None:
+            # add cards
+            if len(self.cards) > 0:
+                for card in self.cards:
+                    player.set_aside.remove(card)
+                    player.hand.add(card)
+
+                if len(self.cards) == 1:
+                    logger.info(f"{player} puts card in hand: {self.cards[0]}")
+                else:
+                    logger.info(f"{player} puts cards in hand: {self.cards}")
+
+            # trash
+            if len(player.hand) > 0:
+                trash_cards = player.decider.trash_decision(
+                    "Trash a card from your hand (if desired): ",
+                    self.playing_card,
+                    player.hand.cards,
+                    player,
+                    game,
+                    min_num_trash=0,
+                    max_num_trash=1,
+                )
+                assert len(trash_cards) <= 1
+                if len(trash_cards) > 0:
+                    player.trash(trash_cards[0], game)
+
+            game.effect_registry.unregister_turn_start_effect(self.get_id())
+
+    def __init__(self):
+        super().__init__(
+            name="Church", cost=3, type=(CardType.Action, CardType.Duration), actions=1
+        )
+
+    def duration_play(
+        self,
+        player: Player,
+        game: "Game",
+        multi_play_card: Card | None,
+        count: int,
+        generic_play: bool = True,
+    ) -> None:
+
+        Action.play(self, player, game, generic_play)
+
+        set_aside_cards = []
+        if len(player.hand) > 0:
+            set_aside_cards = player.decider.set_aside_decision(
+                "Set aside up to 3 cards from your hand: ",
+                self,
+                player.hand.cards,
+                player,
+                game,
+                min_num_set_aside=0,
+                max_num_set_aside=3,
+            )
+            assert len(set_aside_cards) <= 3
+
+            for card in set_aside_cards:
+                player.hand.remove(card)
+                player.set_aside.add(card)
+
+        effect = Church.GetCardsTrashEffect(self, player, set_aside_cards)
+        game.effect_registry.register_turn_start_effect(effect)
+
+        self.persist(player, game, multi_play_card, count)
 
 
 class Envoy(Action):
@@ -468,6 +561,7 @@ class WalledVillage(Action):
             logger.info(f"{player} topdecks {self.name}")
 
 
+church = Church()
 envoy = Envoy()
 governor = Governor()
 marchland = Marchland()
@@ -480,6 +574,7 @@ walled_village = WalledVillage()
 promos_set = Expansion(
     "Promos",
     [
+        church,
         envoy,
         governor,
         marchland,

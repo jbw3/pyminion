@@ -86,6 +86,7 @@ from pyminion.expansions.alchemy import (
     university,
 )
 from pyminion.expansions.promos import (
+    church,
     envoy,
     governor,
     marchland,
@@ -1208,6 +1209,27 @@ def test_university_bot(bot: OptimizedBot, game: Game):
     bot.play(university, game)
     assert len(bot.discard_pile) == 1
     assert CardType.Action in bot.discard_pile.cards[0].type
+
+
+def test_church_bot(multiplayer_bot_game: Game):
+    bot = multiplayer_bot_game.players[0]
+
+    bot.hand.cards.clear()
+    bot.hand.add(copper)
+    bot.hand.add(estate)
+    bot.hand.add(church)
+
+    bot.play(church, multiplayer_bot_game)
+    assert len(bot.set_aside) == 1
+
+    bot.start_cleanup_phase(multiplayer_bot_game)
+    assert len(bot.hand) == 5
+    assert len(bot.set_aside) == 1
+
+    bot.start_turn(multiplayer_bot_game)
+    assert len(bot.hand) == 5
+    assert len(bot.set_aside) == 0
+    assert len(multiplayer_bot_game.trash) == 1
 
 
 def test_envoy_bot(multiplayer_bot_game: Game):

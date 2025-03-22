@@ -65,7 +65,7 @@ class OptimizedBotDecider(BotDecider):
             return score_cards + non_score_cards
 
     @staticmethod
-    def determine_set_aside_cards(cards: Iterable[Card], player: Player, game: "Game") -> list[Card]:
+    def determine_set_aside_cards(cards: Iterable[Card], player: Player, game: "Game", required: bool) -> list[Card]:
         num_terminal = sum(1 for c in get_action_cards(cards) if c.actions == 0)
 
         prioritized_cards: list[tuple[int, Card]] = []
@@ -74,10 +74,16 @@ class OptimizedBotDecider(BotDecider):
             # set aside terminal action cards if we don't have enough actions to play them
             if num_terminal > player.state.actions and CardType.Action in card.type and cast(Action, card).actions == 0:
                 priority = 100 + cost.money + 2 * cost.potions
+            # set aside victory and curse cards to decrease the chance they will be shuffled
+            elif len(card.type) == 1 and card.type[0] in [CardType.Victory, CardType.Curse]:
+                priority = 200
+            elif required:
+                priority = 300 + cost.money + 2 * cost.potions
             else:
-                priority = 200 + cost.money + 2 * cost.potions
+                priority = 0
 
-            prioritized_cards.append((priority, card))
+            if priority > 0:
+                prioritized_cards.append((priority, card))
 
         prioritized_cards.sort(key=lambda x: x[0])
         set_aside_cards = [x[1] for x in prioritized_cards]
@@ -332,6 +338,9 @@ class OptimizedBotDecider(BotDecider):
         elif card.name == "Transmute":
             ret = self.transmute(player, game, valid_cards)
             return [ret]
+        elif card.name == "Church":
+            ret = self.church_trash(player, game, valid_cards)
+            return [ret]
         elif card.name == "Governor":
             ret = self.governor_trash(player, game, valid_cards)
             return [ret]
@@ -520,6 +529,8 @@ class OptimizedBotDecider(BotDecider):
         elif card.name == "Island":
             ret = self.island(player, game, valid_cards)
             return [ret]
+        elif card.name == "Church":
+            return self.church_set_aside(valid_cards, player, game, min_num_set_aside, max_num_set_aside)
         else:
             return super().set_aside_decision(prompt, card, valid_cards, player, game, min_num_set_aside, max_num_set_aside)
 
@@ -1418,7 +1429,7 @@ class OptimizedBotDecider(BotDecider):
         game: "Game",
         valid_cards: list[Card],
     ) -> Card:
-        cards = self.determine_set_aside_cards(valid_cards, player, game)
+        cards = self.determine_set_aside_cards(valid_cards, player, game, required=True)
         return cards[0]
 
     def island(
@@ -1666,6 +1677,26 @@ class OptimizedBotDecider(BotDecider):
     ) -> Card:
         card = max(valid_cards, key=lambda c: c.get_cost(player, game))
         return card
+
+    def church_set_aside(
+        self,
+        valid_cards: list["Card"],
+        player: "Player",
+        game: "Game",
+        min_num_set_aside: int,
+        max_num_set_aside: int,
+    ) -> list[Card]:
+        cards = self.determine_set_aside_cards(valid_cards, player, game, required=False)
+        return cards[:max_num_set_aside]
+
+    def church_trash(
+        self,
+        player: "Player",
+        game: "Game",
+        valid_cards: list[Card],
+    ) -> Card:
+        trash_cards = self.determine_trash_cards(valid_cards, player, game, required=False)
+        return trash_cards[0]
 
     def envoy(
         self,
