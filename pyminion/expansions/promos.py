@@ -121,6 +121,71 @@ class Church(ActionDuration):
         self.persist(player, game, multi_play_card, count)
 
 
+class Dismantle(Action):
+    """
+    Trash a card from your hand. If it costs $1 or more, gain a cheaper card and a Gold.
+
+    """
+
+    def __init__(self):
+        super().__init__(name="Dismantle", cost=4, type=(CardType.Action,))
+
+    def play(self, player: Player, game: "Game", generic_play: bool = True) -> None:
+
+        super().play(player, game, generic_play)
+
+        if len(player.hand) == 0:
+            return
+
+        if len(player.hand) == 1:
+            trash_card = player.hand.cards[0]
+        else:
+            trash_cards = player.decider.trash_decision(
+                "Trash a card from your hand: ",
+                self,
+                player.hand.cards,
+                player,
+                game,
+                min_num_trash=1,
+                max_num_trash=1,
+            )
+            assert len(trash_cards) == 1
+            trash_card = trash_cards[0]
+
+        player.trash(trash_card, game)
+
+        if trash_card.get_cost(player, game) < 1:
+            return
+
+        trash_card_cost = trash_card.get_cost(player, game)
+        valid_gain_cards = [
+            card
+            for card in game.supply.available_cards()
+            if card.get_cost(player, game) < trash_card_cost
+        ]
+
+        if len(valid_gain_cards) > 0:
+            if len(valid_gain_cards) == 1:
+                gain_card = valid_gain_cards[0]
+            else:
+                gain_cards = player.decider.gain_decision(
+                    prompt=f"Gain a card costing less than {trash_card_cost}: ",
+                    card=self,
+                    valid_cards=valid_gain_cards,
+                    player=player,
+                    game=game,
+                    min_num_gain=1,
+                    max_num_gain=1,
+                )
+                assert len(gain_cards) == 1
+                gain_card = gain_cards[0]
+                assert gain_card.get_cost(player, game) < trash_card_cost
+
+            player.gain(gain_card, game)
+
+        player.try_gain(gold, game)
+
+
 class Envoy(Action):
     """
     Reveal the top 5 cards of your deck. The player to your left chooses one.
@@ -562,6 +627,7 @@ class WalledVillage(Action):
 
 
 church = Church()
+dismantle = Dismantle()
 envoy = Envoy()
 governor = Governor()
 marchland = Marchland()
@@ -575,6 +641,7 @@ promos_set = Expansion(
     "Promos",
     [
         church,
+        dismantle,
         envoy,
         governor,
         marchland,

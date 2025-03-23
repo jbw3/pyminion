@@ -87,6 +87,7 @@ from pyminion.expansions.alchemy import (
 )
 from pyminion.expansions.promos import (
     church,
+    dismantle,
     envoy,
     governor,
     marchland,
@@ -1229,6 +1230,17 @@ def test_church_bot(multiplayer_bot_game: Game):
     bot.start_turn(multiplayer_bot_game)
     assert len(bot.hand) == 5
     assert len(bot.set_aside) == 0
+    assert len(multiplayer_bot_game.trash) == 1
+
+
+def test_dismantle(multiplayer_bot_game: Game):
+    bot = multiplayer_bot_game.players[0]
+
+    bot.hand.add(dismantle)
+    bot.hand.add(silver)
+    bot.hand.add(province)
+    bot.play(dismantle, multiplayer_bot_game)
+    assert len(bot.discard_pile) == 2
     assert len(multiplayer_bot_game.trash) == 1
 
 
