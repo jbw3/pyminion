@@ -24,6 +24,11 @@ def test_make_mixed_pile():
     assert mixed.unique_cards[1].name == "Copper"
 
 
+def test_make_pile_custom_name():
+    pile = Pile([estate], "Custom")
+    assert pile.name == "Custom"
+
+
 def test_draw_empty_pile():
     pile = Pile([copper])
     assert len(pile) == 1

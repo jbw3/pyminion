@@ -378,7 +378,7 @@ class Hand(AbstractDeck):
 
 
 class Pile(AbstractDeck):
-    def __init__(self, cards: list[Card]):
+    def __init__(self, cards: list[Card], name: str|None = None):
         super().__init__(cards)
         assert len(cards) > 0
 
@@ -386,13 +386,20 @@ class Pile(AbstractDeck):
         all_names: set[str] = set()
         unique_names: list[str] = []
         for card in cards:
-            name = card.name
-            if name not in all_names:
-                unique_names.append(name)
-                all_names.add(name)
+            card_name = card.name
+            if card_name not in all_names:
+                unique_names.append(card_name)
+                all_names.add(card_name)
                 self._unique_cards.append(card)
 
-        self.name = "/".join(unique_names)
+        if name is not None:
+            self._name = name
+        else:
+            self._name = "/".join(unique_names)
+
+    @property
+    def name(self) -> str:
+        return self._name
 
     @property
     def unique_cards(self) -> list[Card]:
