@@ -1710,7 +1710,7 @@ class OptimizedBotDecider(BotDecider):
         game: "Game",
         valid_cards: list[Card],
     ) -> Card:
-        trash_cards = self.determine_trash_cards(valid_cards, player, game, required=False)
+        trash_cards = self.determine_trash_cards(valid_cards, player, game, required=True)
         return trash_cards[0]
 
     def dismantle_gain(

@@ -1236,6 +1236,7 @@ def test_church_bot(multiplayer_bot_game: Game):
 def test_dismantle(multiplayer_bot_game: Game):
     bot = multiplayer_bot_game.players[0]
 
+    bot.hand.cards.clear()
     bot.hand.add(dismantle)
     bot.hand.add(silver)
     bot.hand.add(province)
