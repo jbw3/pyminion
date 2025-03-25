@@ -1,7 +1,7 @@
 import pytest
 
-from pyminion.core import CardType, Card, Supply, Trash
-from pyminion.exceptions import InvalidGameSetup, InvalidPlayerCount
+from pyminion.core import CardType, Card, Pile, Supply, Trash
+from pyminion.exceptions import InvalidGameSetup, InvalidPlayerCount, PileNotFound
 from pyminion.expansions.base import (base_set, curse, duchy, estate, gold, province,
                                       smithy, witch)
 from pyminion.expansions.alchemy import alchemy_set
@@ -240,3 +240,23 @@ def test_include_potions(decider):
     )
     game_potions.start()
     assert any(pile.name == "Potion" for pile in game_potions.supply.piles)
+
+
+def test_add_non_supply_pile(decider):
+    player1 = Player(decider)
+    player2 = Player(decider)
+
+    pile1 = Pile([estate], "Pile1")
+    pile2 = Pile([duchy], "Pile2")
+
+    game = Game([player1, player2], [base_set])
+    assert not game.contains_non_supply_pile(pile1.name)
+    assert not game.contains_non_supply_pile(pile2.name)
+
+    game.add_non_supply_pile(pile1)
+    assert game.contains_non_supply_pile(pile1.name)
+    assert not game.contains_non_supply_pile(pile2.name)
+
+    assert game.get_non_supply_pile(pile1.name).name == pile1.name
+    with pytest.raises(PileNotFound):
+        game.get_non_supply_pile(pile2.name)

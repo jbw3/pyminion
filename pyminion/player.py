@@ -233,13 +233,21 @@ class Player:
             raise InvalidCardPlay(f"Unable to play {card} with type {card.type}")
         return state
 
-    def buy(self, card: Card, game: "Game") -> None:
+    def buy(
+        self,
+        card: Card,
+        game: "Game",
+        source: AbstractDeck|None = None,
+    ) -> None:
         """
         Buy a card from the supply and add to player's discard pile.
         Check that player has sufficient money and buys to gain the card.
 
         """
         assert isinstance(card, Card)
+        if source is None:
+            source = game.supply.get_pile_by_card(card.name)
+
         cost = card.get_cost(self, game)
         if cost.money > self.state.money or cost.potions > self.state.potions:
             raise InsufficientMoney(
@@ -256,15 +264,12 @@ class Player:
         logger.info(f"{self} buys {card}")
 
         if self.possessing_player is None:
-            try:
-                game.supply.gain_card(card)
-            except EmptyPile as e:
-                raise e
+            source.remove(card)
             self.discard_pile.add(card)
             self.current_turn_gains.append((game.current_phase, card))
             game.effect_registry.on_buy(self, card, game, self.discard_pile)
         else:
-            self.possessing_player.gain(card, game, destination=self.possessing_player.discard_pile)
+            self.possessing_player.gain(card, game, destination=self.possessing_player.discard_pile, source=source)
 
     def gain(
         self,

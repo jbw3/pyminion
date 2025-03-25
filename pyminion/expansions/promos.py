@@ -1,5 +1,6 @@
 from enum import IntEnum, unique
 import logging
+import random
 from typing import TYPE_CHECKING, Any
 
 from pyminion.core import (
@@ -8,6 +9,7 @@ from pyminion.core import (
     Card,
     CardType,
     Expansion,
+    Pile,
     Treasure,
     Victory,
     plural,
@@ -28,6 +30,107 @@ if TYPE_CHECKING:
 
 
 logger = logging.getLogger()
+
+
+class BlackMarket(Action):
+    """
+    +$2
+
+    Reveal the top 3 cards of the Black Market deck. Play any number of
+    Treasures from your hand. You may buy one of the revealed cards. Put the
+    rest on the bottom of the Black Market deck in any order.
+
+    Setup: Make a Black Market deck out of different unused Kingdom cards.
+
+    """
+
+    DECK_NAME = "Black Market Deck"
+
+    def __init__(self):
+        super().__init__(name="Black Market", cost=3, type=(CardType.Action,), money=2)
+
+    def play(self, player: Player, game: "Game", generic_play: bool = True) -> None:
+
+        super().play(player, game, generic_play)
+
+        # draw black market cards
+
+        black_market_deck = game.get_non_supply_pile(BlackMarket.DECK_NAME)
+
+        black_market_cards = AbstractDeck()
+        num_draw = min(3, len(black_market_deck))
+        for _ in range(num_draw):
+            top_card = black_market_deck.get_top()
+            black_market_cards.add(top_card)
+            black_market_deck.remove(top_card)
+
+        logger.info(f"Black market cards: {black_market_cards}")
+
+        # allow player to play treasures
+
+        viable_treasures = [
+            card for card in player.hand.cards if CardType.Treasure in card.type
+        ]
+        while len(viable_treasures) > 0:
+            logger.info(f"Hand: {player.hand}")
+
+            card = player.decider.treasure_phase_decision(
+                viable_treasures, player, game
+            )
+            if card is None:
+                break
+
+            player.exact_play(card, game)
+            logger.info(f"{player.player_id} plays {card.name}")
+
+            viable_treasures = [
+                card for card in player.hand.cards if CardType.Treasure in card.type
+            ]
+
+        # allow player to buy a card
+
+        logger.info(f"Money: {player.state.money}")
+        if player.state.potions > 0:
+            logger.info(f"Potions: {player.state.potions}")
+
+        buy_cards = player.decider.gain_decision(
+            prompt="Buy a black market card (if desired): ",
+            card=self,
+            valid_cards=black_market_cards.cards,
+            player=player,
+            game=game,
+            min_num_gain=0,
+            max_num_gain=1,
+        )
+        assert 0 <= len(buy_cards) <= 1
+
+        if len(buy_cards) > 0:
+            player.state.buys += 1
+            player.buy(buy_cards[0], game, black_market_cards)
+
+        # return unbought cards to the bottom of the black market deck
+
+        for card in black_market_cards:
+            black_market_deck.add_bottom(card)
+
+    def set_up(self, game: "Game") -> None:
+        supply_card_names = set(
+            card.name for pile in game.supply.piles for card in pile.unique_cards
+        )
+
+        valid_cards: list[Card] = [
+            card
+            for expansion in game.expansions
+            for cards in expansion.kingdom_cards
+            for card in cards
+            if card.name not in supply_card_names
+        ]
+        random.shuffle(valid_cards)
+
+        black_market_cards = valid_cards[:50]
+
+        black_market_deck = Pile(black_market_cards, BlackMarket.DECK_NAME)
+        game.add_non_supply_pile(black_market_deck)
 
 
 class Church(ActionDuration):
@@ -626,6 +729,7 @@ class WalledVillage(Action):
             logger.info(f"{player} topdecks {self.name}")
 
 
+black_market = BlackMarket()
 church = Church()
 dismantle = Dismantle()
 envoy = Envoy()
@@ -640,6 +744,7 @@ walled_village = WalledVillage()
 promos_set = Expansion(
     "Promos",
     [
+        black_market,
         church,
         dismantle,
         envoy,

@@ -5,7 +5,7 @@ from typing import Iterator
 
 from pyminion.core import Card, DeckCounter, DiscardPile, Expansion, Pile, Supply, Trash
 from pyminion.effects import EffectRegistry
-from pyminion.exceptions import InvalidGameSetup, InvalidPlayerCount
+from pyminion.exceptions import InvalidGameSetup, InvalidPlayerCount, PileNotFound
 from pyminion.expansions.base import (copper, curse, duchy, estate, gold,
                                       province, silver)
 from pyminion.expansions.alchemy import potion
@@ -66,6 +66,7 @@ class Game:
         self.random_order = random_order
         self.trash = Trash()
         self.current_phase: Game.Phase = Game.Phase.Action
+        self._non_supply_piles: dict[str, Pile] = {}
 
         self.effect_registry = EffectRegistry()
 
@@ -200,14 +201,27 @@ class Game:
         kingdom_piles = self._create_kingdom_piles()
         basic_score_piles = self._create_basic_score_piles()
         basic_treasure_piles = self._create_basic_treasure_piles(kingdom_piles)
-        all_piles = basic_score_piles + basic_treasure_piles + kingdom_piles
+        all_piles = basic_score_piles + basic_treasure_piles + kingdom_piles + [p for p in self._non_supply_piles.values()]
         self.all_game_cards = [card for pile in all_piles for card in pile.unique_cards]
         return Supply(basic_score_piles, basic_treasure_piles, kingdom_piles)
+
+    def add_non_supply_pile(self, pile: Pile) -> None:
+        self._non_supply_piles[pile.name] = pile
+
+    def get_non_supply_pile(self, pile_name: str) -> Pile:
+        try:
+            return self._non_supply_piles[pile_name]
+        except KeyError:
+            raise PileNotFound(f"{pile_name} is not a valid non-supply pile")
+
+    def contains_non_supply_pile(self, pile_name: str) -> bool:
+        return pile_name in self._non_supply_piles
 
     def start(self) -> None:
         logger.info("\nStarting Game...\n")
 
         self.trash.cards.clear()
+        self._non_supply_piles.clear()
         self.effect_registry.reset()
 
         self.supply = self._create_supply()

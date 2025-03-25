@@ -405,6 +405,13 @@ class Pile(AbstractDeck):
     def unique_cards(self) -> list[Card]:
         return self._unique_cards
 
+    def add_bottom(self, card: Card) -> None:
+        """
+        Add a card to the bottom of the pile.
+
+        """
+        self.cards.insert(0, card)
+
     def remove(self, card: Card) -> Card:
         if len(self.cards) < 1:
             raise EmptyPile(f"{self.name} pile is empty, cannot gain card")

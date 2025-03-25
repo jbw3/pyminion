@@ -29,6 +29,15 @@ def test_make_pile_custom_name():
     assert pile.name == "Custom"
 
 
+def test_add_bottom_pile():
+    pile = Pile([estate], "Test")
+    assert len(pile) == 1
+
+    pile.add_bottom(copper)
+    assert len(pile) == 2
+    assert pile.cards[0].name == "Copper"
+
+
 def test_draw_empty_pile():
     pile = Pile([copper])
     assert len(pile) == 1
