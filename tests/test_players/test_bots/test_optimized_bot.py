@@ -86,6 +86,7 @@ from pyminion.expansions.alchemy import (
     university,
 )
 from pyminion.expansions.promos import (
+    black_market,
     church,
     dismantle,
     envoy,
@@ -1210,6 +1211,22 @@ def test_university_bot(bot: OptimizedBot, game: Game):
     bot.play(university, game)
     assert len(bot.discard_pile) == 1
     assert CardType.Action in bot.discard_pile.cards[0].type
+
+
+@pytest.mark.expansions([base_set, promos_set])
+@pytest.mark.kingdom_cards([black_market])
+def test_black_market_bot(multiplayer_bot_game: Game):
+    bot = multiplayer_bot_game.players[0]
+
+    bot.hand.cards.clear()
+    bot.hand.add(black_market)
+    bot.hand.add(silver)
+    bot.hand.add(gold)
+
+    bot.play(black_market, multiplayer_bot_game)
+    assert len(bot.playmat) == 3
+    assert set(c.name for c in bot.playmat) == {"Black Market", "Gold", "Silver"}
+    assert len(bot.discard_pile) == 1
 
 
 def test_church_bot(multiplayer_bot_game: Game):

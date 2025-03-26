@@ -401,6 +401,9 @@ class OptimizedBotDecider(BotDecider):
         elif card.name == "University":
             ret = self.university_gain(player, game, valid_cards)
             return [ret]
+        elif card.name == "Black Market":
+            ret = self.black_market(player, game, valid_cards)
+            return [ret]
         elif card.name == "Dismantle":
             ret = self.dismantle_gain(player, game, valid_cards)
             return [ret]
@@ -1712,6 +1715,15 @@ class OptimizedBotDecider(BotDecider):
     ) -> Card:
         trash_cards = self.determine_trash_cards(valid_cards, player, game, required=True)
         return trash_cards[0]
+
+    def black_market(
+        self,
+        player: "Player",
+        game: "Game",
+        valid_cards: list[Card],
+    ) -> Card:
+        card = max(valid_cards, key=lambda c: c.get_cost(player, game))
+        return card
 
     def dismantle_gain(
         self,
