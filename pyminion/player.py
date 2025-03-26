@@ -416,7 +416,9 @@ class Player:
 
     def start_treasure_phase(self, game: "Game") -> None:
         game.current_phase = game.Phase.Buy
+        self.play_treasures(game)
 
+    def play_treasures(self, game: "Game") -> None:
         viable_treasures = [card for card in self.hand.cards if CardType.Treasure in card.type]
         while len(viable_treasures) > 0:
             logger.info(f"Hand: {self.hand}")

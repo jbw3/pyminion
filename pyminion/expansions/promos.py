@@ -68,24 +68,7 @@ class BlackMarket(Action):
 
         # allow player to play treasures
 
-        viable_treasures = [
-            card for card in player.hand.cards if CardType.Treasure in card.type
-        ]
-        while len(viable_treasures) > 0:
-            logger.info(f"Hand: {player.hand}")
-
-            card = player.decider.treasure_phase_decision(
-                viable_treasures, player, game
-            )
-            if card is None:
-                break
-
-            player.exact_play(card, game)
-            logger.info(f"{player.player_id} plays {card.name}")
-
-            viable_treasures = [
-                card for card in player.hand.cards if CardType.Treasure in card.type
-            ]
+        player.play_treasures(game)
 
         # allow player to buy a card
 
@@ -93,20 +76,28 @@ class BlackMarket(Action):
         if player.state.potions > 0:
             logger.info(f"Potions: {player.state.potions}")
 
-        buy_cards = player.decider.gain_decision(
-            prompt="Buy a black market card (if desired): ",
-            card=self,
-            valid_cards=black_market_cards.cards,
-            player=player,
-            game=game,
-            min_num_gain=0,
-            max_num_gain=1,
-        )
-        assert 0 <= len(buy_cards) <= 1
+        valid_cards = [
+            card
+            for card in black_market_cards
+            if card.get_cost(player, game).money <= player.state.money
+            and card.get_cost(player, game).potions <= player.state.potions
+        ]
 
-        if len(buy_cards) > 0:
-            player.state.buys += 1
-            player.buy(buy_cards[0], game, black_market_cards)
+        if len(valid_cards) > 0:
+            buy_cards = player.decider.gain_decision(
+                prompt="Buy a black market card (if desired): ",
+                card=self,
+                valid_cards=valid_cards,
+                player=player,
+                game=game,
+                min_num_gain=0,
+                max_num_gain=1,
+            )
+            assert 0 <= len(buy_cards) <= 1
+
+            if len(buy_cards) > 0:
+                player.state.buys += 1
+                player.buy(buy_cards[0], game, black_market_cards)
 
         # return unbought cards to the bottom of the black market deck
 

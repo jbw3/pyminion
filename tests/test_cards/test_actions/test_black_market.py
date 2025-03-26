@@ -1,6 +1,6 @@
 from pyminion.expansions.base import base_set, copper, gold
 from pyminion.expansions.intrigue import intrigue_set
-from pyminion.expansions.alchemy import alchemy_set
+from pyminion.expansions.alchemy import alchemy_set, potion
 from pyminion.expansions.promos import BlackMarket, promos_set, black_market
 from pyminion.game import Game
 from pyminion.human import Human
@@ -31,8 +31,9 @@ def test_black_market_buy(human: Human, game: Game, monkeypatch):
     human.hand.add(copper)
     human.hand.add(gold)
     human.hand.add(gold)
+    human.hand.add(potion)
 
-    responses = ["gold,gold", "", top_card.name]
+    responses = ["gold,gold,potion", "", top_card.name]
     monkeypatch.setattr("builtins.input", lambda _: responses.pop(0))
 
     human.play(black_market, game)
@@ -41,8 +42,8 @@ def test_black_market_buy(human: Human, game: Game, monkeypatch):
     assert human.state.buys == 1
     assert len(human.hand) == 1
     assert human.hand.cards[0].name == "Copper"
-    assert len(human.playmat) == 3
-    assert set(c.name for c in human.playmat) == {"Black Market", "Gold"}
+    assert len(human.playmat) == 4
+    assert set(c.name for c in human.playmat) == {"Black Market", "Gold", "Potion"}
     assert len(human.discard_pile) == 1
     assert human.discard_pile.cards[0].name == top_card.name
     assert len(black_market_deck) == 49
