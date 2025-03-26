@@ -98,8 +98,8 @@ def test_pile_length(supply: Supply):
 
 def test_get_pile():
     sauna_avanto_cards: list[Card] = []
-    sauna_avanto_cards += [sauna] * 5
     sauna_avanto_cards += [avanto] * 5
+    sauna_avanto_cards += [sauna] * 5
     sauna_avanto_pile = Pile(sauna_avanto_cards)
     supply = Supply([], [], [sauna_avanto_pile])
 
@@ -110,8 +110,8 @@ def test_get_pile():
 
 def test_get_pile_by_card():
     sauna_avanto_cards: list[Card] = []
-    sauna_avanto_cards += [sauna] * 5
     sauna_avanto_cards += [avanto] * 5
+    sauna_avanto_cards += [sauna] * 5
     sauna_avanto_pile = Pile(sauna_avanto_cards)
     supply = Supply([], [], [sauna_avanto_pile])
 

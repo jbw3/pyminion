@@ -750,7 +750,7 @@ promos_set = Expansion(
         envoy,
         governor,
         marchland,
-        [sauna, avanto],
+        [avanto, sauna],
         stash,
         walled_village,
     ],

@@ -391,6 +391,7 @@ class Pile(AbstractDeck):
                 unique_names.append(card_name)
                 all_names.add(card_name)
                 self._unique_cards.append(card)
+        unique_names.reverse()
 
         if name is not None:
             self._name = name
@@ -415,10 +416,12 @@ class Pile(AbstractDeck):
     def remove(self, card: Card) -> Card:
         if len(self.cards) < 1:
             raise EmptyPile(f"{self.name} pile is empty, cannot gain card")
-        if card.name != self.cards[0].name:
+        if card.name != self.cards[-1].name:
             raise CardNotFound(f"Cannot gain {card.name} as it is not the top card of the pile")
 
-        super().remove(card)
+        self.cards.pop()
+        if self.on_remove is not None:
+            self.on_remove(card)
         return card
 
     def get_top(self) -> Card:
@@ -429,7 +432,7 @@ class Pile(AbstractDeck):
         if len(self.cards) < 1:
             raise EmptyPile(f"{self.name} pile is empty, cannot get top card")
 
-        return self.cards[0]
+        return self.cards[-1]
 
 
 class Playmat(AbstractDeck):

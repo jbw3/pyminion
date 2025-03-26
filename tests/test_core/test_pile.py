@@ -17,7 +17,7 @@ def test_make_pile():
 def test_make_mixed_pile():
     mixed = Pile([estate, copper])
     assert len(mixed) == 2
-    assert mixed.name == "Estate/Copper"
+    assert mixed.name == "Copper/Estate"
 
     assert len(mixed.unique_cards) == 2
     assert mixed.unique_cards[0].name == "Estate"
@@ -57,11 +57,11 @@ def test_get_top_pile():
     pile = Pile([estate, copper])
     assert len(pile) == 2
 
-    assert pile.get_top().name == "Estate"
+    assert pile.get_top().name == "Copper"
     assert len(pile) == 2
 
-    pile.remove(estate)
+    pile.remove(copper)
     assert len(pile) == 1
 
-    assert pile.get_top().name == "Copper"
+    assert pile.get_top().name == "Estate"
     assert len(pile) == 1

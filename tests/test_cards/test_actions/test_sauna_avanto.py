@@ -81,7 +81,7 @@ def test_sauna_avanto_chain(human: Human, game: Game, monkeypatch):
 
 
 @pytest.mark.expansions([base_set, promos_set])
-@pytest.mark.kingdom_cards([[sauna, avanto]])
+@pytest.mark.kingdom_cards([[avanto, sauna]])
 def test_sauna_avanto_pile(game: Game):
     pile = game.supply.get_pile("Sauna/Avanto")
 
@@ -90,14 +90,16 @@ def test_sauna_avanto_pile(game: Game):
 
     # first 5 cards should be Sauna
     for _ in range(5):
-        card = pile.remove(sauna)
+        card = pile.get_top()
         assert card.name == "Sauna"
+        pile.remove(sauna)
         expected_num_cards -= 1
         assert len(pile) == expected_num_cards
 
     # last 5 cards should be Avanto
     for _ in range(5):
-        card = pile.remove(avanto)
+        card = pile.get_top()
         assert card.name == "Avanto"
+        pile.remove(avanto)
         expected_num_cards -= 1
         assert len(pile) == expected_num_cards
