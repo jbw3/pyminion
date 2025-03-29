@@ -379,7 +379,7 @@ class Governor(Action):
             return
 
         trash = player.decider.binary_decision(
-            prompt="Would you like to trash a card from your hand?",
+            prompt="Would you like to trash a card from your hand? (y/n): ",
             card=self,
             player=player,
             game=game,
@@ -389,7 +389,7 @@ class Governor(Action):
             return
 
         trash_cards = player.decider.trash_decision(
-            prompt="Choose a card from your hand to trash",
+            prompt="Choose a card from your hand to trash: ",
             card=self,
             valid_cards=player.hand.cards,
             player=player,
