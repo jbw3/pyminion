@@ -1,17 +1,19 @@
 from pyminion.expansions.base import gold
 from pyminion.expansions.alchemy import alchemy_set, herbalist
 from pyminion.game import Game
-from pyminion.human import Human
 from pyminion.player import Player
 import pytest
 
 
 @pytest.mark.expansions([alchemy_set])
 @pytest.mark.kingdom_cards([herbalist])
-def test_herbalist(player: Player, game: Game):
+def test_herbalist(multiplayer_game: Game):
+    player = multiplayer_game.players[0]
+
+    player.hand.cards.clear()
     player.hand.add(herbalist)
 
-    player.play(herbalist, game)
+    player.play(herbalist, multiplayer_game)
     assert len(player.hand) == 0
     assert player.state.actions == 0
     assert player.state.buys == 2

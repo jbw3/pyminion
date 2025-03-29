@@ -1,6 +1,6 @@
 import pytest
 
-from pyminion.core import CardType, Card, Pile, Supply, Trash
+from pyminion.core import CardType, Card, Pile, Trash
 from pyminion.exceptions import InvalidGameSetup, InvalidPlayerCount, PileNotFound
 from pyminion.expansions.base import (base_set, curse, duchy, estate, gold, province,
                                       smithy, witch)
@@ -8,6 +8,7 @@ from pyminion.expansions.alchemy import alchemy_set
 from pyminion.game import Game
 from pyminion.human import Human
 from pyminion.player import Player
+from pyminion.supply import Supply
 
 
 def test_game_fixture(game: Game):
@@ -224,19 +225,21 @@ def test_include_potions(decider):
     player2 = Player(decider)
 
     # game should not have potion when it has no cards with potion in the cost
+    base_kingdom_cards: list[Card | list[Card]] = [c for c in base_set.kingdom_cards[:10]]
     game_no_potions = Game(
         players=[player1, player2],
         expansions=[base_set],
-        kingdom_cards=base_set.kingdom_cards[:10],
+        kingdom_cards=base_kingdom_cards,
     )
     game_no_potions.start()
     assert not any(pile.name == "Potion" for pile in game_no_potions.supply.piles)
 
     # game should have potion when it has cards with potion in the cost
+    alchemy_kingdom_cards: list[Card | list[Card]] = [c for c in alchemy_set.kingdom_cards[:10]]
     game_potions = Game(
         players=[player1, player2],
         expansions=[alchemy_set],
-        kingdom_cards=alchemy_set.kingdom_cards[:10],
+        kingdom_cards=alchemy_kingdom_cards,
     )
     game_potions.start()
     assert any(pile.name == "Potion" for pile in game_potions.supply.piles)

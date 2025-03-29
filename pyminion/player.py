@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Iterable, Iterator
 
 from pyminion.core import (AbstractDeck, Action, CardType, Card, Deck, DiscardPile, Hand,
-                           Playmat, Supply, Trash, Treasure, get_action_cards, get_treasure_cards,
+                           Playmat, Trash, Treasure, get_action_cards, get_treasure_cards,
                            get_score_cards)
 from pyminion.decider import Decider
 from pyminion.exceptions import (CardNotFound, EmptyPile, InsufficientBuys,

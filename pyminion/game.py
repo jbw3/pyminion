@@ -3,14 +3,14 @@ import logging
 import random
 from typing import Iterator
 
-from pyminion.core import Card, DeckCounter, DiscardPile, Expansion, Pile, Supply, Trash
+from pyminion.core import Card, DeckCounter, DiscardPile, Expansion, Pile, Trash
 from pyminion.effects import EffectRegistry
 from pyminion.exceptions import InvalidGameSetup, InvalidPlayerCount, PileNotFound
 from pyminion.expansions.base import (copper, curse, duchy, estate, gold,
                                       province, silver)
-from pyminion.expansions.alchemy import potion
 from pyminion.player import Player
 from pyminion.result import GameOutcome, GameResult, PlayerSummary
+from pyminion.supply import Supply
 
 
 logger = logging.getLogger()
@@ -106,7 +106,7 @@ class Game:
 
         return basic_piles
 
-    def _create_basic_treasure_piles(self, kingdom_piles: list[Pile]) -> list[Pile]:
+    def _create_basic_treasure_piles(self) -> list[Pile]:
         """
         Create the basic treasure piles that are applicable to almost all games of Dominion.
 
@@ -117,12 +117,6 @@ class Game:
             silver,
             gold,
         ]
-
-        for pile in kingdom_piles:
-            for card in pile.unique_cards:
-                if card.base_cost.potions > 0:
-                    basic_cards.insert(0, potion)
-                    break
 
         basic_piles = [
             Pile([card] * card.get_pile_starting_count(self))
@@ -200,9 +194,7 @@ class Game:
 
         kingdom_piles = self._create_kingdom_piles()
         basic_score_piles = self._create_basic_score_piles()
-        basic_treasure_piles = self._create_basic_treasure_piles(kingdom_piles)
-        all_piles = basic_score_piles + basic_treasure_piles + kingdom_piles + [p for p in self._non_supply_piles.values()]
-        self.all_game_cards = [card for pile in all_piles for card in pile.unique_cards]
+        basic_treasure_piles = self._create_basic_treasure_piles()
         return Supply(basic_score_piles, basic_treasure_piles, kingdom_piles)
 
     def add_non_supply_pile(self, pile: Pile) -> None:
@@ -217,6 +209,7 @@ class Game:
     def contains_non_supply_pile(self, pile_name: str) -> bool:
         return pile_name in self._non_supply_piles
 
+
     def start(self) -> None:
         logger.info("\nStarting Game...\n")
 
@@ -225,10 +218,37 @@ class Game:
         self.effect_registry.reset()
 
         self.supply = self._create_supply()
-        logger.info(self.supply.get_pretty_string(self.players[0], self))
 
-        for card in self.all_game_cards:
-            card.set_up(self)
+        # set up kingdom cards
+        for pile in self.supply.piles:
+            for card in pile.unique_cards:
+                card.set_up(self)
+
+        # set up non-supply piles
+        for pile in self._non_supply_piles.values():
+            for card in pile.unique_cards:
+                card.set_up(self)
+
+        def get_all_piles() -> Iterator[Pile]:
+            for pile in self.supply.piles:
+                yield pile
+            for pile in self._non_supply_piles.values():
+                yield pile
+
+        def get_all_cards() -> Iterator[Card]:
+            for pile in get_all_piles():
+                for card in pile.unique_cards:
+                    yield card
+
+        # check if we need potions
+        for card in get_all_cards():
+            if card.base_cost.potions > 0:
+                self.supply.add_potions(self)
+                break
+
+        self.all_game_cards = list(get_all_cards())
+
+        logger.info(self.supply.get_pretty_string(self.players[0], self))
 
         if self.random_order:
             random.shuffle(self.players)

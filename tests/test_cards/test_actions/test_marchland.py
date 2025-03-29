@@ -1,16 +1,16 @@
 from pyminion.expansions.base import base_set, estate, duchy
 from pyminion.expansions.promos import marchland, promos_set
 from pyminion.game import Game
-from pyminion.human import Human
 from pyminion.player import Player
 import pytest
 
 
 @pytest.mark.expansions([base_set, promos_set])
 @pytest.mark.kingdom_cards([marchland])
-def test_marchland_gain(human: Human, game: Game, monkeypatch):
-    human.hand.cards.clear()
+def test_marchland_gain(multiplayer_game: Game, monkeypatch):
+    human = multiplayer_game.players[0]
 
+    human.hand.cards.clear()
     human.hand.add(estate)
     human.hand.add(estate)
     human.hand.add(duchy)
@@ -23,7 +23,7 @@ def test_marchland_gain(human: Human, game: Game, monkeypatch):
     assert len(human.hand) == 3
     assert set(c.name for c in human.hand) == {"Estate", "Duchy"}
 
-    human.gain(marchland, game)
+    human.gain(marchland, multiplayer_game)
 
     assert human.state.money == 2
     assert human.state.buys == 2

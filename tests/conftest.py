@@ -2,7 +2,7 @@ import pytest
 from pyminion.bots.bot import Bot
 from pyminion.bots.examples import BigMoney
 from pyminion.bots.optimized_bot import OptimizedBot
-from pyminion.core import Deck, Pile, Supply, Trash
+from pyminion.core import Deck, Pile, Trash
 from pyminion.effects import EffectRegistry
 from pyminion.expansions.base import (
     base_set,
@@ -16,6 +16,7 @@ from pyminion.expansions.base import (
 from pyminion.game import Game, Card
 from pyminion.human import Human
 from pyminion.player import Player
+from pyminion.supply import Supply
 
 START_COPPER = 7
 START_ESTATE = 3

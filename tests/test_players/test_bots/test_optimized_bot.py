@@ -1301,11 +1301,14 @@ def test_governor_bot(multiplayer_bot_game: Game):
 
 @pytest.mark.expansions([base_set, promos_set])
 @pytest.mark.kingdom_cards([marchland])
-def test_marchland_bot(bot: OptimizedBot, game: Game):
+def test_marchland_bot(multiplayer_bot_game: Game):
+    bot = multiplayer_bot_game.players[0]
+
+    bot.hand.cards.clear()
     bot.hand.add(estate)
     bot.hand.add(copper)
 
-    bot.gain(marchland, game)
+    bot.gain(marchland, multiplayer_bot_game)
 
     assert len(bot.hand) == 1
     assert bot.hand.cards[0].name == "Copper"
