@@ -64,7 +64,7 @@ class BlackMarket(Action):
             black_market_cards.add(top_card)
             black_market_deck.remove(top_card)
 
-        logger.info(f"Black market cards: {black_market_cards}")
+        player.reveal(black_market_cards, game, "Black market cards: ")
 
         # allow player to play treasures
 
