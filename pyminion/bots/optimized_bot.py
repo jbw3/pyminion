@@ -339,8 +339,7 @@ class OptimizedBotDecider(BotDecider):
             ret = self.transmute(player, game, valid_cards)
             return [ret]
         elif card.name == "Church":
-            ret = self.church_trash(player, game, valid_cards)
-            return [ret]
+            return self.church_trash(player, game, valid_cards)
         elif card.name == "Dismantle":
             ret = self.dismantle_trash(player, game, valid_cards)
             return [ret]
@@ -1703,9 +1702,9 @@ class OptimizedBotDecider(BotDecider):
         player: "Player",
         game: "Game",
         valid_cards: list[Card],
-    ) -> Card:
+    ) -> list[Card]:
         trash_cards = self.determine_trash_cards(valid_cards, player, game, required=False)
-        return trash_cards[0]
+        return trash_cards[:1]
 
     def dismantle_trash(
         self,
