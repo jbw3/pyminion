@@ -250,7 +250,7 @@ class Game:
 
         self.all_game_cards = list(get_all_cards())
 
-        logger.info(self.supply.get_pretty_string(self.players[0], self))
+        logger.info(self.get_buyables_pretty_string(self.players[0]))
 
         if self.random_order:
             random.shuffle(self.players)
@@ -356,6 +356,7 @@ class Game:
         if len(self.events) > 0:
             s += "\nEvents:\n"
             s += "  ".join(f"{e.get_cost(player, self):>3} {e.name}" for e in self.events)
+            s += "\n"
 
         return s
 

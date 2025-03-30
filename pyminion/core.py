@@ -158,8 +158,8 @@ class Card(Buyable):
         super().__init__(name, cost)
         self.type = type
 
-    def __repr__(self):
-        return f"{self.name}"
+    def __repr__(self) -> str:
+        return self.name
 
     def get_cost(self, player: "Player", game: "Game") -> Cost:
         if game.card_cost_reduction > 0:
@@ -478,6 +478,9 @@ class Event(Buyable):
     Base class representing a dominion event
 
     """
+
+    def __repr__(self) -> str:
+        return self.name
 
 
 class Expansion:
