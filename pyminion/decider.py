@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Protocol, Sequence
 
 if TYPE_CHECKING:
-    from pyminion.core import Card, Player
+    from pyminion.core import Buyable, Card, Player
     from pyminion.effects import Effect
     from pyminion.game import Game
 
@@ -33,10 +33,10 @@ class Decider(Protocol):
 
     def buy_phase_decision(
         self,
-        valid_cards: list["Card"],
+        valid_buyables: list["Buyable"],
         player: "Player",
         game: "Game",
-    ) -> "Card|None":
+    ) -> "Buyable|None":
         raise NotImplementedError("buy_phase_decision is not implemented")
 
     def effects_order_decision(

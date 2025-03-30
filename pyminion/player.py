@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Iterable, Iterator
 
-from pyminion.core import (AbstractDeck, Action, CardType, Card, Deck, DiscardPile, Hand,
+from pyminion.core import (AbstractDeck, Action, Buyable, CardType, Card, Deck, DiscardPile, Hand,
                            Playmat, Trash, Treasure, get_action_cards, get_treasure_cards,
                            get_score_cards)
 from pyminion.decider import Decider
@@ -235,41 +235,30 @@ class Player:
 
     def buy(
         self,
-        card: Card,
+        buyable: Buyable,
         game: "Game",
         source: AbstractDeck|None = None,
     ) -> None:
         """
-        Buy a card from the supply and add to player's discard pile.
-        Check that player has sufficient money and buys to gain the card.
+        Buy a buyable. Check that player has sufficient money and buys to gain it.
 
         """
-        assert isinstance(card, Card)
-        if source is None:
-            source = game.supply.get_pile_by_card(card.name)
-
-        cost = card.get_cost(self, game)
+        cost = buyable.get_cost(self, game)
         if cost.money > self.state.money or cost.potions > self.state.potions:
             raise InsufficientMoney(
-                f"{self.player_id}: Not enough money to buy {card.name}"
+                f"{self.player_id}: Not enough money to buy {buyable.name}"
             )
         if self.state.buys < 1:
             raise InsufficientBuys(
-                f"{self.player_id}: Not enough buys to buy {card.name}"
+                f"{self.player_id}: Not enough buys to buy {buyable.name}"
             )
         self.state.money -= cost.money
         self.state.potions -= cost.potions
         self.state.buys -= 1
 
-        logger.info(f"{self} buys {card}")
+        logger.info(f"{self} buys {buyable}")
 
-        if self.possessing_player is None:
-            source.remove(card)
-            self.discard_pile.add(card)
-            self.current_turn_gains.append((game.current_phase, card))
-            game.effect_registry.on_buy(self, card, game, self.discard_pile)
-        else:
-            self.possessing_player.gain(card, game, destination=self.possessing_player.discard_pile, source=source)
+        buyable.buy(self, game, source)
 
     def gain(
         self,
@@ -432,6 +421,10 @@ class Player:
 
             viable_treasures = [card for card in self.hand.cards if CardType.Treasure in card.type]
 
+    def can_afford(self, buyable: Buyable, game: "Game") -> bool:
+        cost = buyable.get_cost(self, game)
+        return cost.money <= self.state.money and cost.potions <= self.state.potions
+
     def start_buy_phase(self, game: "Game") -> None:
         while self.state.buys > 0:
             logger.info(game.supply.get_pretty_string(self, game))
@@ -440,23 +433,22 @@ class Player:
                 logger.info(f"Potions: {self.state.potions}")
             logger.info(f"Buys: {self.state.buys}")
 
-            valid_cards = [
+            valid_buyables = [
                 c
-                for c in game.supply.available_cards()
-                if c.get_cost(self, game).money <= self.state.money and
-                   c.get_cost(self, game).potions <= self.state.potions
+                for c in game.available_buyables()
+                if self.can_afford(c, game)
             ]
-            card = self.decider.buy_phase_decision(
-                valid_cards=valid_cards,
+            buyable = self.decider.buy_phase_decision(
+                valid_buyables=valid_buyables,
                 player=self,
                 game=game,
             )
 
-            if card is None:
+            if buyable is None:
                 logger.info(f"{self} buys nothing")
                 break
 
-            self.buy(card, game)
+            self.buy(buyable, game)
 
         game.effect_registry.on_buy_phase_end(self, game)
 

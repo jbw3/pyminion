@@ -1,20 +1,20 @@
 import pytest
-from pyminion.human import single_card_decision
+from pyminion.human import single_decision
 from pyminion.exceptions import InvalidSingleCardInput
 from pyminion.expansions.base import copper, estate
 
-valid_cards = [copper, copper, estate]
+valid_card_names = [copper.name, copper.name, estate.name]
 
 
 def test_no_input(monkeypatch):
     monkeypatch.setattr("builtins.input", lambda _: "")
-    assert not single_card_decision(prompt="test", valid_cards=valid_cards)
+    assert single_decision(prompt="test", valid_strings=valid_card_names) is None
 
 
 def test_valid_card(monkeypatch):
     monkeypatch.setattr("builtins.input", lambda _: "Copper")
-    card = single_card_decision(prompt="test", valid_cards=valid_cards)
-    assert card == copper
+    card_name = single_decision(prompt="test", valid_strings=valid_card_names)
+    assert card_name == copper.name
 
 
 def test_invalid_card(monkeypatch):
@@ -22,7 +22,7 @@ def test_invalid_card(monkeypatch):
     with pytest.raises(
         InvalidSingleCardInput, match="Invalid input, Silver is not a valid selection"
     ):
-        single_card_decision(prompt="test", valid_cards=valid_cards)
+        single_decision(prompt="test", valid_strings=valid_card_names)
 
 
 def test_invalid_spelling(monkeypatch):
@@ -30,10 +30,10 @@ def test_invalid_spelling(monkeypatch):
     with pytest.raises(
         InvalidSingleCardInput, match="Invalid input, coopper is not a valid selection"
     ):
-        single_card_decision(prompt="test", valid_cards=valid_cards)
+        single_decision(prompt="test", valid_strings=valid_card_names)
 
 
 def test_confirm_case_insensitive(monkeypatch):
     monkeypatch.setattr("builtins.input", lambda _: "copper")
-    card = single_card_decision(prompt="test", valid_cards=valid_cards)
-    assert card == copper
+    card_name = single_decision(prompt="test", valid_strings=valid_card_names)
+    assert card_name == copper.name

@@ -3,7 +3,7 @@ import logging
 import random
 from typing import Iterator
 
-from pyminion.core import Card, DeckCounter, DiscardPile, Expansion, Pile, Trash
+from pyminion.core import Buyable, Card, DeckCounter, DiscardPile, Expansion, Pile, Trash
 from pyminion.effects import EffectRegistry
 from pyminion.exceptions import InvalidGameSetup, InvalidPlayerCount, PileNotFound
 from pyminion.expansions.base import (copper, curse, duchy, estate, gold,
@@ -209,7 +209,6 @@ class Game:
     def contains_non_supply_pile(self, pile_name: str) -> bool:
         return pile_name in self._non_supply_piles
 
-
     def start(self) -> None:
         logger.info("\nStarting Game...\n")
 
@@ -335,6 +334,15 @@ class Game:
                     result = self.summarize_game()
                     logging.info(f"\n{result}")
                     return result
+
+    def available_buyables(self) -> Iterator[Buyable]:
+        """
+        Return all available items that may be bought
+        (e.g. cards, events).
+
+        """
+        for card in self.supply.available_cards():
+            yield card
 
     def get_left_player(self, player: Player) -> Player:
         """

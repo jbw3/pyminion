@@ -109,6 +109,29 @@ class Cost:
         return self._potions
 
 
+class Buyable:
+    """
+    Base class representing things that can be bought (e.g. cards, events)
+
+    """
+    def __init__(self, name: str, cost: int|Cost):
+        self.name = name
+        if isinstance(cost, int):
+            self._base_cost = Cost(cost)
+        else:
+            self._base_cost = cost
+
+    @property
+    def base_cost(self) -> Cost:
+        return self._base_cost
+
+    def get_cost(self, player: "Player", game: "Game") -> Cost:
+        return self._base_cost
+
+    def buy(self, player: "Player", game: "Game", source: "AbstractDeck|None"=None) -> None:
+        pass
+
+
 @unique
 class CardType(Enum):
     """
@@ -124,7 +147,7 @@ class CardType(Enum):
     Duration = 7
 
 
-class Card:
+class Card(Buyable):
 
     """
     Base class representing a dominion card
@@ -132,23 +155,28 @@ class Card:
     """
 
     def __init__(self, name: str, cost: int|Cost, type: tuple[CardType, ...]):
-        self.name = name
-        if isinstance(cost, int):
-            self._base_cost = Cost(cost)
-        else:
-            self._base_cost = cost
+        super().__init__(name, cost)
         self.type = type
 
     def __repr__(self):
         return f"{self.name}"
 
-    @property
-    def base_cost(self) -> Cost:
+    def get_cost(self, player: "Player", game: "Game") -> Cost:
+        if game.card_cost_reduction > 0:
+            return self._base_cost - game.card_cost_reduction
         return self._base_cost
 
-    def get_cost(self, player: "Player", game: "Game") -> Cost:
-        cost = self._base_cost - game.card_cost_reduction
-        return cost
+    def buy(self, player: "Player", game: "Game", source: "AbstractDeck|None"=None) -> None:
+        if source is None:
+            source = game.supply.get_pile_by_card(self.name)
+
+        if player.possessing_player is None:
+            source.remove(self)
+            player.discard_pile.add(self)
+            player.current_turn_gains.append((game.current_phase, self))
+            game.effect_registry.on_buy(player, self, game, player.discard_pile)
+        else:
+            player.possessing_player.gain(self, game, destination=player.possessing_player.discard_pile, source=source)
 
     def get_pile_starting_count(self, game: "Game") -> int:
         return 10

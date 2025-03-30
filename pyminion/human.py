@@ -3,7 +3,7 @@ import logging
 from collections import Counter
 from typing import TYPE_CHECKING, Callable, Sequence
 
-from pyminion.core import (Card, Deck)
+from pyminion.core import (Buyable, Card, Deck)
 from pyminion.effects import Effect
 from pyminion.exceptions import (InvalidBinaryInput,
                                  InvalidMultiCardInput, InvalidMultiOptionInput,
@@ -111,39 +111,33 @@ def binary_decision(prompt: str) -> bool:
         raise InvalidBinaryInput("Invalid response, valid choices are 'yes' or 'no'")
 
 
-def single_card_decision(
-    prompt: str, valid_cards: list[Card]
-) -> Card|None:
+def single_decision(
+    prompt: str, valid_strings: list[str]
+) -> str|None:
     """
-    Get user input when given the option to select one card
+    Get user input when given the option to select one item.
 
-    valid_cards are a list of cards that a user can choose from. For example,
-    when prompting a user to discard a card from their hand, valid cards would
-    be the user's hand.
+    valid_strings are a list of names that a user can choose from. For example,
+    when prompting a user to discard a card from their hand, valid_strings would
+    be the cards in the user's hand.
 
-    valid_mixin allows for options other than a card to be selected. For example,
-    "all" mixin would be used to autoplay treasures when prompting treasures to play
-
-    Raise exception if user provided selection is not in valid_cards and is not
-    a valid_mixin.
+    Raise exception if user provided selection is not in valid_strings.
 
     """
-    card_input = input(prompt)
-    if not card_input:
+    str_input = input(prompt)
+    if not str_input:
         return None
 
-    cards_dict = {card.name: card for card in valid_cards}
-
-    matches = get_matches(card_input, list(cards_dict.keys()))
+    matches = get_matches(str_input, valid_strings)
     if len(matches) == 0:
         raise InvalidSingleCardInput(
-            f"Invalid input, {card_input} is not a valid selection"
+            f"Invalid input, {str_input} is not a valid selection"
         )
     elif len(matches) == 1:
-        return cards_dict[matches[0]]
+        return matches[0]
     else:
         raise InvalidSingleCardInput(
-            f"Invalid input, multiple matches for {card_input}: " + ", ".join(matches)
+            f"Invalid input, multiple matches for {str_input}: " + ", ".join(matches)
         )
 
 
@@ -286,12 +280,19 @@ class HumanDecider:
         player: "Player",
         game: "Game",
     ) -> Card|None:
-        card = single_card_decision(
+        card_name = single_decision(
             prompt="Choose an action card to play: ",
-            valid_cards=valid_actions,
+            valid_strings=[c.name for c in valid_actions],
         )
 
-        return card
+        if card_name is None:
+            return None
+
+        for card in valid_actions:
+            if card.name == card_name:
+                return card
+
+        assert False, f"Invalid card name: {card_name}"
 
     @validate_input(exceptions=InvalidMultiCardInput)
     def treasure_phase_decision(
@@ -318,16 +319,23 @@ class HumanDecider:
     @validate_input(exceptions=InvalidSingleCardInput)
     def buy_phase_decision(
         self,
-        valid_cards: list[Card],
+        valid_buyables: list[Buyable],
         player: "Player",
         game: "Game",
-    ) -> Card|None:
-        card = single_card_decision(
-            prompt="Choose a card to buy: ",
-            valid_cards=valid_cards,
+    ) -> Buyable|None:
+        buyable_name = single_decision(
+            prompt="Choose an item to buy: ",
+            valid_strings=[b.name for b in valid_buyables],
         )
 
-        return card
+        if buyable_name is None:
+            return None
+
+        for buyable in valid_buyables:
+            if buyable.name == buyable_name:
+                return buyable
+
+        assert False, f"Invalid buyable name: {buyable_name}"
 
     @validate_input(exceptions=InvalidEffectsOrderInput)
     def effects_order_decision(
@@ -574,14 +582,21 @@ class HumanDecider:
         game: "Game",
         required: bool = True,
     ) -> Card|None:
-        result = single_card_decision(prompt, valid_cards)
+        result = single_decision(prompt, [c.name for c in valid_cards])
 
-        if required and result is None:
-            raise InvalidSingleCardInput(
-                f"Invalid response, you must name a valid card"
-            )
+        if result is None:
+            if required:
+                raise InvalidSingleCardInput(
+                    "Invalid response, you must name a valid card"
+                )
+            else:
+                return None
 
-        return result
+        for card in valid_cards:
+            if card.name == result:
+                return card
+
+        assert False, f"Invalid card name: {result}"
 
     @validate_input(exceptions=InvalidMultiCardInput)
     def set_aside_decision(

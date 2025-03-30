@@ -2,7 +2,7 @@ import pytest
 from pyminion.bots.bot import Bot
 from pyminion.bots.examples import BigMoney
 from pyminion.bots.optimized_bot import OptimizedBot
-from pyminion.core import Deck, Pile, Trash
+from pyminion.core import Buyable, Card, Deck, Pile, Trash
 from pyminion.effects import EffectRegistry
 from pyminion.expansions.base import (
     base_set,
@@ -13,7 +13,7 @@ from pyminion.expansions.base import (
     province,
     silver,
 )
-from pyminion.game import Game, Card
+from pyminion.game import Game
 from pyminion.human import Human
 from pyminion.player import Player
 from pyminion.supply import Supply
@@ -37,10 +37,10 @@ class TestDecider:
 
     def buy_phase_decision(
         self,
-        valid_cards: list[Card],
+        valid_buyables: list[Buyable],
         player: "Player",
         game: "Game",
-    ) -> Card|None:
+    ) -> Buyable|None:
         return None
 
     def binary_decision(

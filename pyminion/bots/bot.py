@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING, Iterator, Sequence
 
-from pyminion.core import Card
+from pyminion.core import Buyable, Card
 from pyminion.decider import Decider
 from pyminion.player import Player
 
@@ -71,10 +71,10 @@ class BotDecider:
 
     def buy_phase_decision(
         self,
-        valid_cards: list[Card],
+        valid_buyables: list[Buyable],
         player: "Player",
         game: "Game",
-    ) -> Card|None:
+    ) -> Buyable|None:
         for card in self.buy_priority(player, game):
             if game.supply.pile_length(card.name) > 0:
                 return card
