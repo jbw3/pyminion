@@ -427,7 +427,7 @@ class Player:
 
     def start_buy_phase(self, game: "Game") -> None:
         while self.state.buys > 0:
-            logger.info(game.supply.get_pretty_string(self, game))
+            logger.info(game.get_buyables_pretty_string(self))
             logger.info(f"Money: {self.state.money}")
             if self.state.potions > 0:
                 logger.info(f"Potions: {self.state.potions}")

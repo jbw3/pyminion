@@ -473,16 +473,29 @@ class Trash(AbstractDeck):
         super().__init__(cards)
 
 
+class Event(Buyable):
+    """
+    Base class representing a dominion event
+
+    """
+
+
 class Expansion:
     """
     Contains the cards in an expansion.
 
     """
-    def __init__(self, name: str, kingdom_cards: list[Card|list[Card]]):
+    def __init__(
+        self,
+        name: str,
+        kingdom_cards: list[Card|list[Card]],
+        events: list[Event]|None = None,
+    ):
         self._name = name
         self._kingdom_cards = [
             [c] if isinstance(c, Card) else c for c in kingdom_cards
         ]
+        self._events = [] if events is None else events
 
     @property
     def name(self) -> str:
@@ -491,6 +504,10 @@ class Expansion:
     @property
     def kingdom_cards(self) -> list[list[Card]]:
         return self._kingdom_cards
+
+    @property
+    def events(self) -> list[Event]:
+        return self._events
 
 
 def plural(word: str, count: int) -> str:

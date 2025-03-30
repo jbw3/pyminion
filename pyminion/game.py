@@ -3,7 +3,7 @@ import logging
 import random
 from typing import Iterator
 
-from pyminion.core import Buyable, Card, DeckCounter, DiscardPile, Expansion, Pile, Trash
+from pyminion.core import Buyable, Card, DeckCounter, DiscardPile, Event, Expansion, Pile, Trash
 from pyminion.effects import EffectRegistry
 from pyminion.exceptions import InvalidGameSetup, InvalidPlayerCount, PileNotFound
 from pyminion.expansions.base import (copper, curse, duchy, estate, gold,
@@ -24,6 +24,7 @@ class Game:
         players: List of players in the game.
         expansions: List expansions (and their cards) eligible to be used in the game's supply.
         kingdom_cards: Specify any specific cards to be used in the supply.
+        events: Specify any specific events to be used in the game.
         start_deck: List of cards each player will start the game with. Default = [7 Coppers + 3 Estates].
         random_order: If True, scrambles the order of players (to offset first player advantage).
         log_stdout: If True, logs game to stdout.
@@ -43,6 +44,7 @@ class Game:
         players: list[Player],
         expansions: list[Expansion],
         kingdom_cards: list[Card|list[Card]]|None = None,
+        events: list[Event]|None = None,
         start_deck: list[Card]|None = None,
         random_order: bool = True,
         log_stdout: bool = True,
@@ -60,6 +62,7 @@ class Game:
         self.kingdom_cards = [] if kingdom_cards is None else [
             [c] if isinstance(c, Card) else c for c in kingdom_cards
         ]
+        self.events = [] if events is None else events
         self.all_game_cards: list[Card] = []
         self.card_cost_reduction = 0
         self.start_deck = start_deck
@@ -343,6 +346,18 @@ class Game:
         """
         for card in self.supply.available_cards():
             yield card
+
+        for event in self.events:
+            yield event
+
+    def get_buyables_pretty_string(self, player: Player) -> str:
+        s = self.supply.get_pretty_string(player, self)
+
+        if len(self.events) > 0:
+            s += "\nEvents:\n"
+            s += "  ".join(f"{e.get_cost(player, self):>3} {e.name}" for e in self.events)
+
+        return s
 
     def get_left_player(self, player: Player) -> Player:
         """
