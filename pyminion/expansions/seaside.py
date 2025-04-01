@@ -127,7 +127,7 @@ class Blockade(ActionDuration):
         ]
         gain_cards = player.decider.gain_decision(
             prompt="Gain a card costing up to $4: ",
-            card=self,
+            buyable=self,
             valid_cards=valid_cards,
             player=player,
             game=game,

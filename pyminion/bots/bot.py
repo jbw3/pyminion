@@ -92,7 +92,7 @@ class BotDecider:
     def binary_decision(
         self,
         prompt: str,
-        card: Card,
+        buyable: Buyable,
         player: "Player",
         game: "Game",
         relevant_cards: list[Card]|None = None,
@@ -101,7 +101,7 @@ class BotDecider:
 
     def multiple_option_decision(
         self,
-        card: "Card",
+        buyable: Buyable,
         options: list[str],
         player: "Player",
         game: "Game",
@@ -113,7 +113,7 @@ class BotDecider:
     def discard_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: Buyable,
         valid_cards: list[Card],
         player: "Player",
         game: "Game",
@@ -125,7 +125,7 @@ class BotDecider:
     def trash_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: Buyable,
         valid_cards: list[Card],
         player: "Player",
         game: "Game",
@@ -137,7 +137,7 @@ class BotDecider:
     def gain_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: Buyable,
         valid_cards: list[Card],
         player: "Player",
         game: "Game",
@@ -149,7 +149,7 @@ class BotDecider:
     def topdeck_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: Buyable,
         valid_cards: list[Card],
         player: "Player",
         game: "Game",
@@ -161,7 +161,7 @@ class BotDecider:
     def deck_position_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: Buyable,
         player: "Player",
         game: "Game",
         num_deck_cards: int,
@@ -171,7 +171,7 @@ class BotDecider:
     def reveal_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: Buyable,
         valid_cards: list[Card],
         player: "Player",
         game: "Game",
@@ -183,7 +183,7 @@ class BotDecider:
     def pass_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: Buyable,
         valid_cards: list[Card],
         player: "Player",
         game: "Game",
@@ -195,7 +195,7 @@ class BotDecider:
     def name_card_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: Buyable,
         valid_cards: list[Card],
         player: "Player",
         game: "Game",
@@ -207,7 +207,7 @@ class BotDecider:
     def multi_play_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: Buyable,
         valid_cards: list[Card],
         player: "Player",
         game: "Game",
@@ -221,7 +221,7 @@ class BotDecider:
     def set_aside_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: Buyable,
         valid_cards: list[Card],
         player: "Player",
         game: "Game",

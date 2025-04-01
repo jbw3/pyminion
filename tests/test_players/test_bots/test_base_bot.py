@@ -12,7 +12,7 @@ def test_effects_order_decision(base_bot: Bot, game: Game):
 
 
 def test_binary_decision(base_bot: Bot, game: Game):
-    assert base_bot.decider.binary_decision(prompt="test", card=copper, player=base_bot, game=game, relevant_cards=None)
+    assert base_bot.decider.binary_decision(prompt="test", buyable=copper, player=base_bot, game=game, relevant_cards=None)
 
 
 def test_multiple_option_decision(base_bot: Bot, game: Game):
@@ -29,7 +29,7 @@ def test_multiple_option_decision(base_bot: Bot, game: Game):
 def test_multiple_discard_decision(base_bot: Bot, game: Game):
     cards = base_bot.decider.discard_decision(
         prompt="",
-        card=copper,
+        buyable=copper,
         valid_cards=[copper, estate, gold],
         player=base_bot,
         game=game,
@@ -42,7 +42,7 @@ def test_multiple_discard_decision(base_bot: Bot, game: Game):
 def test_multiple_discard_decision_none(base_bot: Bot, game: Game):
     cards = base_bot.decider.discard_decision(
         prompt="",
-        card=copper,
+        buyable=copper,
         valid_cards=[copper, estate, gold],
         player=base_bot,
         game=game,
@@ -54,7 +54,7 @@ def test_multiple_discard_decision_none(base_bot: Bot, game: Game):
 def test_gain_decision(base_bot: Bot, game: Game):
     cards = base_bot.decider.gain_decision(
         prompt="",
-        card=copper,
+        buyable=copper,
         valid_cards=[copper, estate, gold],
         player=base_bot,
         game=game,
@@ -67,7 +67,7 @@ def test_gain_decision(base_bot: Bot, game: Game):
 def test_gain_decision_none(base_bot: Bot, game: Game):
     cards = base_bot.decider.gain_decision(
         prompt="",
-        card=copper,
+        buyable=copper,
         valid_cards=[copper, estate, gold],
         player=base_bot,
         game=game,
@@ -79,7 +79,7 @@ def test_gain_decision_none(base_bot: Bot, game: Game):
 def test_trash_decision(base_bot: Bot, game: Game):
     cards = base_bot.decider.trash_decision(
         prompt="",
-        card=copper,
+        buyable=copper,
         valid_cards=[copper, estate, gold],
         player=base_bot,
         game=game,
@@ -92,7 +92,7 @@ def test_trash_decision(base_bot: Bot, game: Game):
 def test_trash_decision_none(base_bot: Bot, game: Game):
     cards = base_bot.decider.trash_decision(
         prompt="",
-        card=copper,
+        buyable=copper,
         valid_cards=[copper, estate, gold],
         player=base_bot,
         game=game,
@@ -104,7 +104,7 @@ def test_trash_decision_none(base_bot: Bot, game: Game):
 def test_topdeck_decision(base_bot: Bot, game: Game):
     cards = base_bot.decider.topdeck_decision(
         prompt="",
-        card=copper,
+        buyable=copper,
         valid_cards=[copper, estate, gold],
         player=base_bot,
         game=game,
@@ -117,7 +117,7 @@ def test_topdeck_decision(base_bot: Bot, game: Game):
 def test_topdeck_decision_none(base_bot: Bot, game: Game):
     cards = base_bot.decider.topdeck_decision(
         prompt="",
-        card=copper,
+        buyable=copper,
         valid_cards=[copper, estate, gold],
         player=base_bot,
         game=game,
@@ -185,7 +185,7 @@ def test_name_card_decision(base_bot: Bot, game: Game):
 def test_multi_play_decision(base_bot: Bot, game: Game):
     card = base_bot.decider.multi_play_decision(
         prompt="",
-        card=copper,
+        buyable=copper,
         valid_cards=[copper, estate, gold],
         player=base_bot,
         game=game,
@@ -198,7 +198,7 @@ def test_multi_play_decision(base_bot: Bot, game: Game):
 def test_multi_play_decision_none(base_bot: Bot, game: Game):
     card = base_bot.decider.multi_play_decision(
         prompt="",
-        card=copper,
+        buyable=copper,
         valid_cards=[copper, estate, gold],
         player=base_bot,
         game=game,

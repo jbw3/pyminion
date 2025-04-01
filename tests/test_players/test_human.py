@@ -56,16 +56,16 @@ def test_get_matches_multi_word_exact_match():
 
 def test_yes_input(human: Human, game: Game, monkeypatch):
     monkeypatch.setattr("builtins.input", lambda _: "y")
-    assert human.decider.binary_decision(prompt="test", card=copper, player=human, game=game) is True
+    assert human.decider.binary_decision(prompt="test", buyable=copper, player=human, game=game) is True
     monkeypatch.setattr("builtins.input", lambda _: "yes")
-    assert human.decider.binary_decision(prompt="test", card=copper, player=human, game=game) is True
+    assert human.decider.binary_decision(prompt="test", buyable=copper, player=human, game=game) is True
 
 
 def test_no_input(human: Human, game: Game, monkeypatch):
     monkeypatch.setattr("builtins.input", lambda _: "n")
-    assert human.decider.binary_decision(prompt="test", card=copper, player=human, game=game) is False
+    assert human.decider.binary_decision(prompt="test", buyable=copper, player=human, game=game) is False
     monkeypatch.setattr("builtins.input", lambda _: "no")
-    assert human.decider.binary_decision(prompt="test", card=copper, player=human, game=game) is False
+    assert human.decider.binary_decision(prompt="test", buyable=copper, player=human, game=game) is False
 
 
 @pytest.mark.kingdom_cards([moat])

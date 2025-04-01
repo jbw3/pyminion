@@ -268,7 +268,7 @@ class Action(Card):
             else:
                 discard_cards = player.decider.discard_decision(
                     prompt=f"Discard {self.discard} card(s) from your hand: ",
-                    card=self,
+                    buyable=self,
                     valid_cards=player.hand.cards,
                     player=player,
                     game=game,

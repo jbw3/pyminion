@@ -350,7 +350,7 @@ class HumanDecider:
     def binary_decision(
         self,
         prompt: str,
-        card: Card,
+        buyable: Buyable,
         player: "Player",
         game: "Game",
         relevant_cards: list[Card]|None = None,
@@ -365,7 +365,7 @@ class HumanDecider:
     @validate_input(exceptions=InvalidMultiOptionInput)
     def multiple_option_decision(
         self,
-        card: Card,
+        buyable: Buyable,
         options: list[str],
         player: "Player",
         game: "Game",
@@ -383,7 +383,7 @@ class HumanDecider:
     def discard_decision(
         self,
         prompt: str,
-        card: Card,
+        buyable: Buyable,
         valid_cards: list[Card],
         player: "Player",
         game: "Game",
@@ -409,7 +409,7 @@ class HumanDecider:
     def trash_decision(
         self,
         prompt: str,
-        card: Card,
+        buyable: Buyable,
         valid_cards: list[Card],
         player: "Player",
         game: "Game",
@@ -435,7 +435,7 @@ class HumanDecider:
     def gain_decision(
         self,
         prompt: str,
-        card: Card,
+        buyable: Buyable,
         valid_cards: list[Card],
         player: "Player",
         game: "Game",
@@ -460,7 +460,7 @@ class HumanDecider:
     def topdeck_decision(
         self,
         prompt: str,
-        card: Card,
+        buyable: Buyable,
         valid_cards: list[Card],
         player: "Player",
         game: "Game",
@@ -485,7 +485,7 @@ class HumanDecider:
     def deck_position_decision(
         self,
         prompt: str,
-        card: Card,
+        buyable: Buyable,
         player: "Player",
         game: "Game",
         num_deck_cards: int,
@@ -501,7 +501,7 @@ class HumanDecider:
     def reveal_decision(
         self,
         prompt: str,
-        card: Card,
+        buyable: Buyable,
         valid_cards: list[Card],
         player: "Player",
         game: "Game",
@@ -526,7 +526,7 @@ class HumanDecider:
     def pass_decision(
         self,
         prompt: str,
-        card: Card,
+        buyable: Buyable,
         valid_cards: list[Card],
         player: "Player",
         game: "Game",
@@ -551,7 +551,7 @@ class HumanDecider:
     def name_card_decision(
         self,
         prompt: str,
-        card: Card,
+        buyable: Buyable,
         valid_cards: list[Card],
         player: "Player",
         game: "Game",
@@ -576,7 +576,7 @@ class HumanDecider:
     def multi_play_decision(
         self,
         prompt: str,
-        card: Card,
+        buyable: Buyable,
         valid_cards: list[Card],
         player: "Player",
         game: "Game",
@@ -602,7 +602,7 @@ class HumanDecider:
     def set_aside_decision(
         self,
         prompt: str,
-        card: Card,
+        buyable: Buyable,
         valid_cards: list[Card],
         player: "Player",
         game: "Game",

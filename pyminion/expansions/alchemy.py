@@ -177,7 +177,7 @@ class Apothecary(Action):
         else:
             topdeck_cards = player.decider.topdeck_decision(
                 prompt="Enter the cards in the order you would like to topdeck: ",
-                card=self,
+                buyable=self,
                 valid_cards=revealed.cards,
                 player=player,
                 game=game,
@@ -599,7 +599,7 @@ class University(Action):
 
         gain = player.decider.binary_decision(
             prompt="Do you want to gain an Action card costing up to 5 money? (y/n): ",
-            card=self,
+            buyable=self,
             player=player,
             game=game,
         )
@@ -608,7 +608,7 @@ class University(Action):
 
         gain_cards = player.decider.gain_decision(
             prompt="Gain a card costing up to 5 money: ",
-            card=self,
+            buyable=self,
             valid_cards=valid_cards,
             player=player,
             game=game,

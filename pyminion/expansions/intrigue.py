@@ -131,7 +131,7 @@ class Courtier(Action):
         else:
             reveal_cards = player.decider.reveal_decision(
                 prompt="Reveal a card from your hand: ",
-                card=self,
+                buyable=self,
                 valid_cards=player.hand.cards,
                 player=player,
                 game=game,
@@ -155,7 +155,7 @@ class Courtier(Action):
                 "Gain a Gold",
             ]
             choices = player.decider.multiple_option_decision(
-                card=self,
+                buyable=self,
                 options=options,
                 player=player,
                 game=game,
@@ -196,7 +196,7 @@ class Courtyard(Action):
 
         topdeck_cards = player.decider.topdeck_decision(
             prompt="Enter the card you would like to topdeck: ",
-            card=self,
+            buyable=self,
             valid_cards=player.hand.cards,
             player=player,
             game=game,
@@ -231,7 +231,7 @@ class Diplomat(Action):
         def handler(self, attacking_player: Player, defending_player: Player, attack_card: Card, game: "Game") -> bool:
             reveal = defending_player.decider.binary_decision(
                 prompt=f"Reveal {diplomat} to draw 2 cards then discard 3? y/n: ",
-                card=diplomat,
+                buyable=diplomat,
                 player=defending_player,
                 game=game,
                 relevant_cards=[attack_card],
@@ -245,7 +245,7 @@ class Diplomat(Action):
 
             discard_cards = defending_player.decider.discard_decision(
                 prompt="Enter the cards you would like to discard: ",
-                card=diplomat,
+                buyable=diplomat,
                 valid_cards=defending_player.hand.cards,
                 player=defending_player,
                 game=game,
@@ -349,7 +349,7 @@ class Ironworks(Action):
 
         gain_cards = player.decider.gain_decision(
             prompt="Gain a card costing up to 4 money: ",
-            card=self,
+            buyable=self,
             valid_cards=[
                 card for card in game.supply.available_cards() if card.get_cost(player, game) <= 4
             ],
@@ -411,7 +411,7 @@ class Lurker(Action):
             "Gain an Action card from the trash",
         ]
         choices = player.decider.multiple_option_decision(
-            card=self,
+            buyable=self,
             options=options,
             player=player,
             game=game,
@@ -425,7 +425,7 @@ class Lurker(Action):
 
             trash_cards = player.decider.trash_decision(
                 prompt="Choose a card from the Supply to trash",
-                card=self,
+                buyable=self,
                 valid_cards=supply_action_cards,
                 player=player,
                 game=game,
@@ -444,7 +444,7 @@ class Lurker(Action):
 
             gain_cards = player.decider.gain_decision(
                 prompt="Choose a card to gain from the trash",
-                card=self,
+                buyable=self,
                 valid_cards=trash_action_cards,
                 player=player,
                 game=game,
@@ -486,7 +486,7 @@ class Masquerade(Action):
         for p in valid_players:
             pass_cards = p.decider.pass_decision(
                 prompt="Pick a card to pass to the player on your left: ",
-                card=self,
+                buyable=self,
                 valid_cards=p.hand.cards,
                 player=p,
                 game=game,
@@ -512,7 +512,7 @@ class Masquerade(Action):
 
         trash = player.decider.binary_decision(
             prompt="Would you like to trash a card from your hand? (y/n): ",
-            card=self,
+            buyable=self,
             player=player,
             game=game,
         )
@@ -520,7 +520,7 @@ class Masquerade(Action):
         if trash:
             trash_cards = player.decider.trash_decision(
                 prompt="Choose a card from your hand to trash: ",
-                card=self,
+                buyable=self,
                 valid_cards=player.hand.cards,
                 player=player,
                 game=game,
@@ -552,7 +552,7 @@ class Mill(Action, Victory):
 
         discard = player.decider.binary_decision(
             prompt="Do you want to discard 2 cards for +2 money?",
-            card=self,
+            buyable=self,
             player=player,
             game=game,
         )
@@ -564,7 +564,7 @@ class Mill(Action, Victory):
             else:
                 discard_cards = player.decider.discard_decision(
                     prompt="Enter the cards you would like to discard: ",
-                    card=self,
+                    buyable=self,
                     valid_cards=player.hand.cards,
                     player=player,
                     game=game,
@@ -618,7 +618,7 @@ class MiningVillage(Action):
         if not trashed:
             trashed = player.decider.binary_decision(
                 prompt="Trash Mining Village for +2 money? ",
-                card=self,
+                buyable=self,
                 player=player,
                 game=game,
             )
@@ -664,7 +664,7 @@ class Minion(Action):
             "Discard your hand, draw 4 cards, and each other player with at least 5 cards discards their hand and draws 4 cards",
         ]
         choices = player.decider.multiple_option_decision(
-            card=self,
+            buyable=self,
             options=options,
             player=player,
             game=game,
@@ -714,7 +714,7 @@ class Nobles(Action, Victory):
             "+2 Actions",
         ]
         choices = player.decider.multiple_option_decision(
-            card=self,
+            buyable=self,
             options=options,
             player=player,
             game=game,
@@ -770,7 +770,7 @@ class Patrol(Action):
         else:
             topdeck_cards = player.decider.topdeck_decision(
                 prompt="Enter the cards in the order you would like to topdeck: ",
-                card=self,
+                buyable=self,
                 valid_cards=revealed.cards,
                 player=player,
                 game=game,
@@ -811,7 +811,7 @@ class Pawn(Action):
             "+1 Money",
         ]
         choices = player.decider.multiple_option_decision(
-            card=self,
+            buyable=self,
             options=options,
             player=player,
             game=game,
@@ -855,7 +855,7 @@ class Replace(Action):
 
         trash_cards = player.decider.trash_decision(
             prompt="Trash a card from your hand: ",
-            card=self,
+            buyable=self,
             valid_cards=player.hand.cards,
             player=player,
             game=game,
@@ -868,7 +868,7 @@ class Replace(Action):
         max_cost = trash_card.get_cost(player, game) + 2
         gain_cards = player.decider.gain_decision(
             prompt=f"Gain a card costing up to {max_cost} money: ",
-            card=self,
+            buyable=self,
             valid_cards=[
                 card
                 for card in game.supply.available_cards()
@@ -921,7 +921,7 @@ class SecretPassage(Action):
         else:
             insert_cards = player.decider.topdeck_decision(
                 prompt="Enter the card you would like to insert in your deck: ",
-                card=self,
+                buyable=self,
                 valid_cards=player.hand.cards,
                 player=player,
                 game=game,
@@ -937,7 +937,7 @@ class SecretPassage(Action):
         else:
             index = player.decider.deck_position_decision(
                 prompt=f"Enter the deck position (bottom = 1, top = {len_deck+1}): ",
-                card=self,
+                buyable=self,
                 player=player,
                 game=game,
                 num_deck_cards=len_deck,
@@ -999,7 +999,7 @@ class Steward(Action):
             "Trash 2 cards from your hand",
         ]
         choices = player.decider.multiple_option_decision(
-            card=self,
+            buyable=self,
             options=options,
             player=player,
             game=game,
@@ -1025,7 +1025,7 @@ class Steward(Action):
 
         trash_cards = player.decider.trash_decision(
             prompt="Enter 2 cards you would like to trash from your hand: ",
-            card=self,
+            buyable=self,
             valid_cards=player.hand.cards,
             player=player,
             game=game,
@@ -1073,7 +1073,7 @@ class Swindler(Action):
 
                 gain_cards = player.decider.gain_decision(
                     prompt=f"Pick a cost {trashed_cost} card for {opponent} to gain: ",
-                    card=self,
+                    buyable=self,
                     valid_cards=valid_cards,
                     player=player,
                     game=game,
@@ -1115,7 +1115,7 @@ class Torturer(Action):
                     "Gain a Curse to your hand",
                 ]
                 choices = opponent.decider.multiple_option_decision(
-                    card=self,
+                    buyable=self,
                     options=options,
                     player=opponent,
                     game=game,
@@ -1137,7 +1137,7 @@ class Torturer(Action):
 
         discard_cards = opponent.decider.discard_decision(
             prompt=f"You must discard {num_discard} card(s) from your hand: ",
-            card=self,
+            buyable=self,
             valid_cards=opponent.hand.cards,
             player=opponent,
             game=game,
@@ -1173,7 +1173,7 @@ class TradingPost(Action):
         else:
             trash_cards = player.decider.trash_decision(
                 prompt="Trash 2 cards from your hand: ",
-                card=self,
+                buyable=self,
                 valid_cards=player.hand.cards,
                 player=player,
                 game=game,
@@ -1212,7 +1212,7 @@ class Upgrade(Action):
 
         trash_cards = player.decider.trash_decision(
             prompt="Trash a card from your hand: ",
-            card=self,
+            buyable=self,
             valid_cards=player.hand.cards,
             player=player,
             game=game,
@@ -1236,7 +1236,7 @@ class Upgrade(Action):
 
         gain_cards = player.decider.gain_decision(
             prompt=f"Gain a card costing {new_cost} money: ",
-            card=self,
+            buyable=self,
             valid_cards=valid_cards,
             player=player,
             game=game,
@@ -1270,7 +1270,7 @@ class WishingWell(Action):
 
         named_cards = player.decider.name_card_decision(
             prompt="Name a card: ",
-            card=self,
+            buyable=self,
             valid_cards=game.all_game_cards,
             player=player,
             game=game,

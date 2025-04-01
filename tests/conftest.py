@@ -46,7 +46,7 @@ class TestDecider:
     def binary_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: "Buyable",
         player: "Player",
         game: "Game",
         relevant_cards: list[Card]|None = None,

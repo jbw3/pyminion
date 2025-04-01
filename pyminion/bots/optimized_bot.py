@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Iterable, Literal, cast, overload
 
 from pyminion.bots.bot import Bot, BotDecider
-from pyminion.core import Action, CardType, Card, DeckCounter, Treasure, Victory, get_action_cards, get_treasure_cards, get_victory_cards, get_score_cards
+from pyminion.core import Action, Buyable, CardType, Card, DeckCounter, Treasure, Victory, get_action_cards, get_treasure_cards, get_victory_cards, get_score_cards
 from pyminion.decider import Decider
 from pyminion.exceptions import InvalidBotImplementation
 from pyminion.expansions.base import duchy, estate, curse, gold, silver, copper
@@ -150,397 +150,397 @@ class OptimizedBotDecider(BotDecider):
     def binary_decision(
         self,
         prompt: str,
-        card: Card,
+        buyable: Buyable,
         player: "Player",
         game: "Game",
         relevant_cards: list[Card]|None = None,
     ) -> bool:
-        if card.name == "Moneylender":
+        if buyable.name == "Moneylender":
             return self.moneylender(player=player, game=game)
-        elif card.name == "Vassal":
+        elif buyable.name == "Vassal":
             return self.vassal(player=player, game=game, relevant_cards=relevant_cards)
-        elif card.name == "Sentry":
+        elif buyable.name == "Sentry":
             return self.sentry(player=player, game=game, relevant_cards=relevant_cards, binary=True)
-        elif card.name == "Library":
+        elif buyable.name == "Library":
             return self.library(player=player, game=game, relevant_cards=relevant_cards)
-        elif card.name == "Moat":
+        elif buyable.name == "Moat":
             return self.moat(player=player, game=game, relevant_cards=relevant_cards)
-        elif card.name == "Diplomat":
+        elif buyable.name == "Diplomat":
             return self.diplomat(player, game, binary=True)
-        elif card.name == "Masquerade":
+        elif buyable.name == "Masquerade":
             return self.masquerade(player, game, binary=True)
-        elif card.name == "Mill":
+        elif buyable.name == "Mill":
             return self.mill(player, game, binary=True)
-        elif card.name == "Mining Village":
+        elif buyable.name == "Mining Village":
             return self.mining_village(player, game)
-        elif card.name == "Pirate":
+        elif buyable.name == "Pirate":
             return self.pirate_binary(player, game)
-        elif card.name == "Sailor":
+        elif buyable.name == "Sailor":
             return self.sailor_binary(prompt, player, game, relevant_cards)
-        elif card.name == "Treasury":
+        elif buyable.name == "Treasury":
             return self.treasury(prompt, player, game, relevant_cards)
-        elif card.name == "Alchemist":
+        elif buyable.name == "Alchemist":
             return self.alchemist(player, game)
-        elif card.name == "Herbalist":
+        elif buyable.name == "Herbalist":
             assert relevant_cards is not None
             return self.herbalist(player, game, relevant_cards[0])
-        elif card.name == "Scrying Pool":
+        elif buyable.name == "Scrying Pool":
             assert relevant_cards is not None
             return self.scrying_pool(prompt, player, game, relevant_cards)
-        elif card.name == "University":
+        elif buyable.name == "University":
             return self.university_binary(player, game, relevant_cards)
-        elif card.name == "Governor":
+        elif buyable.name == "Governor":
             return self.governor_binary(player, game)
-        elif card.name == "Sauna":
+        elif buyable.name == "Sauna":
             return self.sauna_binary(player, game, relevant_cards)
-        elif card.name == "Avanto":
+        elif buyable.name == "Avanto":
             return self.avanto(player, game, relevant_cards)
-        elif card.name == "Walled Village":
+        elif buyable.name == "Walled Village":
             return self.walled_village(player, game, relevant_cards)
         else:
-            return super().binary_decision(prompt, card, player, game, relevant_cards)
+            return super().binary_decision(prompt, buyable, player, game, relevant_cards)
 
     def multiple_option_decision(
         self,
-        card: "Card",
+        buyable: Buyable,
         options: list[str],
         player: "Player",
         game: "Game",
         num_choices: int = 1,
         unique: bool = True,
     ) -> list[int]:
-        if card.name == "Baron":
+        if buyable.name == "Baron":
             ret = self.baron(player, game)
             return [ret]
-        elif card.name == "Courtier":
+        elif buyable.name == "Courtier":
             return self.courtier(player, game, num_choices=num_choices, options=True)
-        elif card.name == "Lurker":
+        elif buyable.name == "Lurker":
             ret = self.lurker(player, game, options=True)
             return [ret]
-        elif card.name == "Minion":
+        elif buyable.name == "Minion":
             ret = self.minion(player, game)
             return [ret]
-        elif card.name == "Native Village":
+        elif buyable.name == "Native Village":
             ret = self.native_village(player, game)
             return [ret]
-        elif card.name == "Nobles":
+        elif buyable.name == "Nobles":
             ret = self.nobles(player, game)
             return [ret]
-        elif card.name == "Pawn":
+        elif buyable.name == "Pawn":
             return self.pawn(player, game)
-        elif card.name == "Steward":
+        elif buyable.name == "Steward":
             ret = self.steward(player, game, options=True)
             return [ret]
-        elif card.name == "Torturer":
+        elif buyable.name == "Torturer":
             ret = self.torturer(player, game, options=True)
             return [ret]
-        elif card.name == "Golem":
+        elif buyable.name == "Golem":
             ret = self.golem(player, game)
             return [ret]
-        elif card.name == "Governor":
+        elif buyable.name == "Governor":
             ret = self.governor_option(player, game)
             return [ret]
         else:
-            return super().multiple_option_decision(card, options, player, game, num_choices, unique)
+            return super().multiple_option_decision(buyable, options, player, game, num_choices, unique)
 
     def discard_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: Buyable,
         valid_cards: list["Card"],
         player: "Player",
         game: "Game",
         min_num_discard: int = 0,
         max_num_discard: int = -1,
     ) -> list["Card"]:
-        if card.name == "Cellar":
+        if buyable.name == "Cellar":
             return self.cellar(player=player, game=game, valid_cards=valid_cards)
-        elif card.name == "Poacher":
+        elif buyable.name == "Poacher":
             return self.poacher(player=player, game=game, valid_cards=valid_cards, num_discard=min_num_discard)
-        elif card.name == "Militia":
+        elif buyable.name == "Militia":
             return self.militia(player=player, game=game, valid_cards=valid_cards, num_discard=min_num_discard)
-        elif card.name == "Sentry":
+        elif buyable.name == "Sentry":
             return self.sentry(player=player, game=game, valid_cards=valid_cards, discard=True)
-        elif card.name == "Diplomat":
+        elif buyable.name == "Diplomat":
             return self.diplomat(player, game, valid_cards, min_num_discard, discard=True)
-        elif card.name == "Mill":
+        elif buyable.name == "Mill":
             return self.mill(player, game, discard=True)
-        elif card.name == "Torturer":
+        elif buyable.name == "Torturer":
             return self.torturer(player, game, valid_cards=valid_cards, num_discard=min_num_discard, discard=True)
-        elif card.name == "Lookout":
+        elif buyable.name == "Lookout":
             ret = self.lookout(player, game, valid_cards, discard=True)
             return [ret]
-        elif card.name == "Sea Witch":
+        elif buyable.name == "Sea Witch":
             return self.sea_witch(player, game, valid_cards=valid_cards, num_discard=min_num_discard)
-        elif card.name == "Tide Pools":
+        elif buyable.name == "Tide Pools":
             return self.tide_pools(player, game, valid_cards=valid_cards, num_discard=min_num_discard)
-        elif card.name == "Warehouse":
+        elif buyable.name == "Warehouse":
             return self.warehouse(player, game, valid_cards=valid_cards, num_discard=min_num_discard)
-        elif card.name == "Envoy":
+        elif buyable.name == "Envoy":
             ret = self.envoy(player, game, valid_cards)
             return [ret]
-        elif card.name == "Marchland":
+        elif buyable.name == "Marchland":
             return self.marchland(player, game, valid_cards)
         else:
-            return super().discard_decision(prompt, card, valid_cards, player, game, min_num_discard, max_num_discard)
+            return super().discard_decision(prompt, buyable, valid_cards, player, game, min_num_discard, max_num_discard)
 
     def trash_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: Buyable,
         valid_cards: list["Card"],
         player: "Player",
         game: "Game",
         min_num_trash: int = 0,
         max_num_trash: int = -1,
     ) -> list["Card"]:
-        if card.name == "Remodel":
+        if buyable.name == "Remodel":
             ret = self.remodel(player=player, game=game, valid_cards=valid_cards, trash=True)
             return [ret]
-        elif card.name == "Mine":
+        elif buyable.name == "Mine":
             ret = self.mine(player=player, game=game, valid_cards=valid_cards, trash=True)
             return [ret]
-        elif card.name == "Chapel":
+        elif buyable.name == "Chapel":
             return self.chapel(player=player, game=game, valid_cards=valid_cards)
-        elif card.name == "Sentry":
+        elif buyable.name == "Sentry":
             return self.sentry(player=player, game=game, valid_cards=valid_cards, trash=True)
-        elif card.name == "Bandit":
+        elif buyable.name == "Bandit":
             ret = self.bandit(player, game, valid_cards)
             return [ret]
-        elif card.name == "Lurker":
+        elif buyable.name == "Lurker":
             ret = self.lurker(player, game, valid_cards, trash=True)
             return [ret]
-        elif card.name == "Masquerade":
+        elif buyable.name == "Masquerade":
             ret = self.masquerade(player, game, valid_cards, trash=True)
             return [ret]
-        elif card.name == "Replace":
+        elif buyable.name == "Replace":
             ret = self.replace(player, game, valid_cards, trash=True)
             return [ret]
-        elif card.name == "Steward":
+        elif buyable.name == "Steward":
             return self.steward(player, game, valid_cards=valid_cards, trash=True)
-        elif card.name == "Trading Post":
+        elif buyable.name == "Trading Post":
             return self.trading_post(player, game, valid_cards)
-        elif card.name == "Upgrade":
+        elif buyable.name == "Upgrade":
             ret = self.upgrade(player, game, valid_cards, trash=True)
             return [ret]
-        elif card.name == "Lookout":
+        elif buyable.name == "Lookout":
             ret = self.lookout(player, game, valid_cards, trash=True)
             return [ret]
-        elif card.name == "Sailor":
+        elif buyable.name == "Sailor":
             ret = self.sailor_trash(player, game, valid_cards)
             return [ret]
-        elif card.name == "Salvager":
+        elif buyable.name == "Salvager":
             ret = self.salvager(player, game, valid_cards)
             return [ret]
-        elif card.name == "Apprentice":
+        elif buyable.name == "Apprentice":
             ret = self.apprentice(player, game, valid_cards)
             return [ret]
-        elif card.name == "Transmute":
+        elif buyable.name == "Transmute":
             ret = self.transmute(player, game, valid_cards)
             return [ret]
-        elif card.name == "Church":
+        elif buyable.name == "Church":
             return self.church_trash(player, game, valid_cards)
-        elif card.name == "Dismantle":
+        elif buyable.name == "Dismantle":
             ret = self.dismantle_trash(player, game, valid_cards)
             return [ret]
-        elif card.name == "Governor":
+        elif buyable.name == "Governor":
             ret = self.governor_trash(player, game, valid_cards)
             return [ret]
-        elif card.name == "Sauna":
+        elif buyable.name == "Sauna":
             return self.sauna_trash(player, game, valid_cards)
         else:
-            return super().trash_decision(prompt, card, valid_cards, player, game, min_num_trash, max_num_trash)
+            return super().trash_decision(prompt, buyable, valid_cards, player, game, min_num_trash, max_num_trash)
 
     def gain_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: Buyable,
         valid_cards: list["Card"],
         player: "Player",
         game: "Game",
         min_num_gain: int = 0,
         max_num_gain: int = -1,
     ) -> list["Card"]:
-        if card.name == "Artisan":
+        if buyable.name == "Artisan":
             ret = self.artisan(player=player, game=game, gain=True)
             return [ret]
-        elif card.name == "Workshop":
+        elif buyable.name == "Workshop":
             ret = self.workshop(player=player, game=game)
             return [ret]
-        elif card.name == "Remodel":
+        elif buyable.name == "Remodel":
             ret = self.remodel(player=player, game=game, valid_cards=valid_cards, gain=True)
             return [ret]
-        elif card.name == "Mine":
+        elif buyable.name == "Mine":
             ret = self.mine(player=player, game=game, valid_cards=valid_cards, gain=True)
             return [ret]
-        elif card.name == "Ironworks":
+        elif buyable.name == "Ironworks":
             ret = self.ironworks(player, game, valid_cards)
             return [ret]
-        elif card.name == "Lurker":
+        elif buyable.name == "Lurker":
             ret = self.lurker(player, game, valid_cards, gain=True)
             return [ret]
-        elif card.name == "Replace":
+        elif buyable.name == "Replace":
             ret = self.replace(player, game, valid_cards, gain=True)
             return [ret]
-        elif card.name == "Swindler":
+        elif buyable.name == "Swindler":
             ret = self.swindler(player, game, valid_cards)
             return [ret]
-        elif card.name == "Upgrade":
+        elif buyable.name == "Upgrade":
             ret = self.upgrade(player, game, valid_cards, gain=True)
             return [ret]
-        elif card.name == "Blockade":
+        elif buyable.name == "Blockade":
             ret = self.blockade(player, game, valid_cards)
             return [ret]
-        elif card.name == "Pirate":
+        elif buyable.name == "Pirate":
             ret = self.pirate_gain(player, game, valid_cards)
             return [ret]
-        elif card.name == "Smugglers":
+        elif buyable.name == "Smugglers":
             ret = self.smugglers(player, game, valid_cards)
             return [ret]
-        elif card.name == "University":
+        elif buyable.name == "University":
             ret = self.university_gain(player, game, valid_cards)
             return [ret]
-        elif card.name == "Black Market":
+        elif buyable.name == "Black Market":
             ret = self.black_market(player, game, valid_cards)
             return [ret]
-        elif card.name == "Dismantle":
+        elif buyable.name == "Dismantle":
             ret = self.dismantle_gain(player, game, valid_cards)
             return [ret]
-        elif card.name == "Governor":
+        elif buyable.name == "Governor":
             ret = self.governor_gain(player, game, valid_cards)
             return [ret]
         else:
-            return super().gain_decision(prompt, card, valid_cards, player, game, min_num_gain, max_num_gain)
+            return super().gain_decision(prompt, buyable, valid_cards, player, game, min_num_gain, max_num_gain)
 
     def topdeck_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: Buyable,
         valid_cards: list["Card"],
         player: "Player",
         game: "Game",
         min_num_topdeck: int = 0,
         max_num_topdeck: int = -1,
     ) -> list["Card"]:
-        if card.name == "Artisan":
+        if buyable.name == "Artisan":
             ret = self.artisan(player=player, game=game, valid_cards=valid_cards, topdeck=True)
             return [ret]
-        elif card.name == "Harbinger":
+        elif buyable.name == "Harbinger":
             ret = self.harbinger(player=player, game=game, valid_cards=valid_cards)
             return [] if ret is None else [ret]
-        elif card.name == "Bureaucrat":
+        elif buyable.name == "Bureaucrat":
             ret = self.bureaucrat(player=player, game=game, valid_cards=valid_cards)
             return [ret]
-        elif card.name == "Courtyard":
+        elif buyable.name == "Courtyard":
             ret = self.courtyard(player, game, valid_cards)
             return [ret]
-        elif card.name == "Patrol":
+        elif buyable.name == "Patrol":
             return self.patrol(player, game, valid_cards)
-        elif card.name == "Secret Passage":
+        elif buyable.name == "Secret Passage":
             ret = self.secret_passage(player, game, valid_cards=valid_cards, topdeck=True)
             return [ret]
-        elif card.name == "Apothecary":
+        elif buyable.name == "Apothecary":
             return self.apothecary(player, game, valid_cards)
         else:
-            return super().topdeck_decision(prompt, card, valid_cards, player, game, min_num_topdeck, max_num_topdeck)
+            return super().topdeck_decision(prompt, buyable, valid_cards, player, game, min_num_topdeck, max_num_topdeck)
 
     def deck_position_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: Buyable,
         player: "Player",
         game: "Game",
         num_deck_cards: int,
     ) -> int:
-        if card.name == "Secret Passage":
+        if buyable.name == "Secret Passage":
             return self.secret_passage(player, game, num_deck_cards=num_deck_cards, pos=True)
-        elif card.name == "Stash":
+        elif buyable.name == "Stash":
             return self.stash(player, game, num_deck_cards)
         else:
-            return super().deck_position_decision(prompt, card, player, game, num_deck_cards)
+            return super().deck_position_decision(prompt, buyable, player, game, num_deck_cards)
 
     def reveal_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: Buyable,
         valid_cards: list["Card"],
         player: "Player",
         game: "Game",
         min_num_reveal: int = 0,
         max_num_reveal: int = -1,
     ) -> list["Card"]:
-        if card.name == "Courtier":
+        if buyable.name == "Courtier":
             ret = self.courtier(player, game, valid_cards=valid_cards, reveal=True)
             return [ret]
         else:
-            return super().reveal_decision(prompt, card, valid_cards, player, game, min_num_reveal, max_num_reveal)
+            return super().reveal_decision(prompt, buyable, valid_cards, player, game, min_num_reveal, max_num_reveal)
 
     def pass_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: Buyable,
         valid_cards: list["Card"],
         player: "Player",
         game: "Game",
         min_num_pass: int = 0,
         max_num_pass: int = -1,
     ) -> list["Card"]:
-        if card.name == "Masquerade":
+        if buyable.name == "Masquerade":
             ret = self.masquerade(player, game, valid_cards, pass_=True)
             return [ret]
         else:
-            return super().pass_decision(prompt, card, valid_cards, player, game, min_num_pass, max_num_pass)
+            return super().pass_decision(prompt, buyable, valid_cards, player, game, min_num_pass, max_num_pass)
 
     def name_card_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: Buyable,
         valid_cards: list["Card"],
         player: "Player",
         game: "Game",
         min_num_name: int = 0,
         max_num_name: int = -1,
     ) -> list["Card"]:
-        if card.name == "Wishing Well":
+        if buyable.name == "Wishing Well":
             ret = self.wishing_well(player, game)
             return [ret]
         else:
-            return super().name_card_decision(prompt, card, valid_cards, player, game, min_num_name, max_num_name)
+            return super().name_card_decision(prompt, buyable, valid_cards, player, game, min_num_name, max_num_name)
 
     def multi_play_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: Buyable,
         valid_cards: list["Card"],
         player: "Player",
         game: "Game",
         required: bool = True,
     ) -> Card|None:
-        if card.name == "Throne Room":
+        if buyable.name == "Throne Room":
             return self.throne_room(player=player, game=game, valid_cards=valid_cards)
         else:
-            return super().multi_play_decision(prompt, card, valid_cards, player, game, required)
+            return super().multi_play_decision(prompt, buyable, valid_cards, player, game, required)
 
     def set_aside_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: Buyable,
         valid_cards: list["Card"],
         player: "Player",
         game: "Game",
         min_num_set_aside: int = 0,
         max_num_set_aside: int = -1,
     ) -> list["Card"]:
-        if card.name == "Haven":
+        if buyable.name == "Haven":
             ret = self.haven(player, game, valid_cards)
             return [ret]
-        elif card.name == "Island":
+        elif buyable.name == "Island":
             ret = self.island(player, game, valid_cards)
             return [ret]
-        elif card.name == "Church":
+        elif buyable.name == "Church":
             return self.church_set_aside(valid_cards, player, game, min_num_set_aside, max_num_set_aside)
         else:
-            return super().set_aside_decision(prompt, card, valid_cards, player, game, min_num_set_aside, max_num_set_aside)
+            return super().set_aside_decision(prompt, buyable, valid_cards, player, game, min_num_set_aside, max_num_set_aside)
 
     # CARD SPECIFIC IMPLEMENTATIONS
 

@@ -80,7 +80,7 @@ class BasicNextTurnEffect(PlayerGameEffect):
                 cards_str = plural("card", self.discard)
                 discard_cards = player.decider.discard_decision(
                     prompt=f"Discard {self.discard} {cards_str} from your hand: ",
-                    card=self.card,
+                    buyable=self.card,
                     valid_cards=player.hand.cards,
                     player=player,
                     game=game,

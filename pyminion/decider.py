@@ -50,7 +50,7 @@ class Decider(Protocol):
     def binary_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: "Buyable",
         player: "Player",
         game: "Game",
         relevant_cards: "list[Card]|None" = None,
@@ -59,7 +59,7 @@ class Decider(Protocol):
 
     def multiple_option_decision(
         self,
-        card: "Card",
+        buyable: "Buyable",
         options: list[str],
         player: "Player",
         game: "Game",
@@ -71,7 +71,7 @@ class Decider(Protocol):
     def discard_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: "Buyable",
         valid_cards: list["Card"],
         player: "Player",
         game: "Game",
@@ -83,7 +83,7 @@ class Decider(Protocol):
     def trash_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: "Buyable",
         valid_cards: list["Card"],
         player: "Player",
         game: "Game",
@@ -95,7 +95,7 @@ class Decider(Protocol):
     def gain_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: "Buyable",
         valid_cards: list["Card"],
         player: "Player",
         game: "Game",
@@ -107,7 +107,7 @@ class Decider(Protocol):
     def topdeck_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: "Buyable",
         valid_cards: list["Card"],
         player: "Player",
         game: "Game",
@@ -119,7 +119,7 @@ class Decider(Protocol):
     def deck_position_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: "Buyable",
         player: "Player",
         game: "Game",
         num_deck_cards: int,
@@ -129,7 +129,7 @@ class Decider(Protocol):
     def reveal_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: "Buyable",
         valid_cards: list["Card"],
         player: "Player",
         game: "Game",
@@ -141,7 +141,7 @@ class Decider(Protocol):
     def pass_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: "Buyable",
         valid_cards: list["Card"],
         player: "Player",
         game: "Game",
@@ -153,7 +153,7 @@ class Decider(Protocol):
     def name_card_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: "Buyable",
         valid_cards: list["Card"],
         player: "Player",
         game: "Game",
@@ -165,7 +165,7 @@ class Decider(Protocol):
     def multi_play_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: "Buyable",
         valid_cards: list["Card"],
         player: "Player",
         game: "Game",
@@ -176,7 +176,7 @@ class Decider(Protocol):
     def set_aside_decision(
         self,
         prompt: str,
-        card: "Card",
+        buyable: "Buyable",
         valid_cards: list["Card"],
         player: "Player",
         game: "Game",

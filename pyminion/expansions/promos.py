@@ -86,7 +86,7 @@ class BlackMarket(Action):
         if len(valid_cards) > 0:
             buy_cards = player.decider.gain_decision(
                 prompt="Buy a black market card (if desired): ",
-                card=self,
+                buyable=self,
                 valid_cards=valid_cards,
                 player=player,
                 game=game,
@@ -264,7 +264,7 @@ class Dismantle(Action):
             else:
                 gain_cards = player.decider.gain_decision(
                     prompt=f"Gain a card costing less than {trash_card_cost}: ",
-                    card=self,
+                    buyable=self,
                     valid_cards=valid_gain_cards,
                     player=player,
                     game=game,
@@ -350,7 +350,7 @@ class Governor(Action):
             "Trash a card and gain a card costing $2 more (opponents trash and gain $1 more)",
         ]
         choices = player.decider.multiple_option_decision(
-            card=self,
+            buyable=self,
             options=options,
             player=player,
             game=game,
@@ -380,7 +380,7 @@ class Governor(Action):
 
         trash = player.decider.binary_decision(
             prompt="Would you like to trash a card from your hand? (y/n): ",
-            card=self,
+            buyable=self,
             player=player,
             game=game,
         )
@@ -390,7 +390,7 @@ class Governor(Action):
 
         trash_cards = player.decider.trash_decision(
             prompt="Choose a card from your hand to trash: ",
-            card=self,
+            buyable=self,
             valid_cards=player.hand.cards,
             player=player,
             game=game,
@@ -413,7 +413,7 @@ class Governor(Action):
 
         gain_cards = player.decider.gain_decision(
             prompt=f"Gain a card costing exactly {cost}: ",
-            card=self,
+            buyable=self,
             valid_cards=valid_cards,
             player=player,
             game=game,
@@ -620,7 +620,7 @@ class Stash(Treasure):
                 len_deck = len(player.deck)
                 index = player.decider.deck_position_decision(
                     prompt=f"Enter the deck position to put Stash (bottom = 1, top = {len_deck+1}): ",
-                    card=self,
+                    buyable=self,
                     player=player,
                     game=game,
                     num_deck_cards=len_deck,
@@ -710,7 +710,7 @@ class WalledVillage(Action):
     def on_cleanup(self, player: Player, game: "Game") -> None:
         topdeck = player.decider.binary_decision(
             prompt=f"Topdeck {self.name}? y/n: ",
-            card=self,
+            buyable=self,
             player=player,
             game=game,
         )
