@@ -409,6 +409,9 @@ class OptimizedBotDecider(BotDecider):
         elif buyable.name == "Governor":
             ret = self.governor_gain(player, game, valid_cards)
             return [ret]
+        elif buyable.name == "Summon":
+            ret = self.summon(player, game, valid_cards)
+            return [ret]
         else:
             return super().gain_decision(prompt, buyable, valid_cards, player, game, min_num_gain, max_num_gain)
 
@@ -1775,6 +1778,14 @@ class OptimizedBotDecider(BotDecider):
         return trash_cards[0]
 
     def governor_gain(
+        self,
+        player: Player,
+        game: "Game",
+        valid_cards: list[Card],
+    ) -> Card:
+        return valid_cards[0]
+
+    def summon(
         self,
         player: Player,
         game: "Game",

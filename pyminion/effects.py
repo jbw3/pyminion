@@ -21,8 +21,9 @@ class EffectAction(IntEnum):
     HandAddCards = 1
     HandRemoveCards = 2
     HandAddRemoveCards = 3
-    First = 4
-    Last = 5
+    PlayCard = 4
+    First = 5
+    Last = 6
 
 
 class Effect:
@@ -299,7 +300,7 @@ class EffectRegistry:
                 # build data structures of non-"other" effects that are triggered
                 order_effects: list[PlayerGameEffect] = [
                     effect for effect in effects
-                    if effect.get_id() not in handled_ids and effect.get_action() in {EffectAction.HandAddCards, EffectAction.HandRemoveCards, EffectAction.HandAddRemoveCards} and effect.is_triggered(player, game)
+                    if effect.get_id() not in handled_ids and effect.get_action() in {EffectAction.HandAddCards, EffectAction.HandRemoveCards, EffectAction.HandAddRemoveCards, EffectAction.PlayCard} and effect.is_triggered(player, game)
                 ]
 
                 if len(order_effects) > 0:

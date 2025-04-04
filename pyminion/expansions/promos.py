@@ -8,6 +8,7 @@ from pyminion.core import (
     Action,
     Card,
     CardType,
+    Event,
     Expansion,
     Pile,
     Treasure,
@@ -720,6 +721,70 @@ class WalledVillage(Action):
             logger.info(f"{player} topdecks {self.name}")
 
 
+class Summon(Event):
+    """
+    Gain an Action card costing up to $4. Set it aside. If you did,
+    then at the start of your next turn, play it.
+
+    """
+
+    class PlayCardEffect(PlayerGameEffect):
+        def __init__(self, player: Player, card: Card):
+            super().__init__(f"Summon: Play {card.name}")
+            self.player = player
+            self.card = card
+
+        def get_action(self) -> EffectAction:
+            return EffectAction.PlayCard
+
+        def is_triggered(self, player: Player, game: "Game") -> bool:
+            return self.player is player
+
+        def handler(self, player: Player, game: "Game") -> None:
+            self.player.set_aside.remove(self.card)
+            self.player.playmat.add(self.card)
+            self.player.exact_play(self.card, game, generic_play=False)
+
+            game.effect_registry.unregister_turn_start_effect(self.get_id())
+
+    def __init__(self):
+        super().__init__(name="Summon", cost=5)
+
+    def buy(
+        self, player: Player, game: "Game", source: AbstractDeck | None = None
+    ) -> None:
+        valid_gain_cards = [
+            card
+            for card in game.supply.available_cards()
+            if CardType.Action in card.type and card.get_cost(player, game) <= 4
+        ]
+
+        if len(valid_gain_cards) == 0:
+            return
+
+        if len(valid_gain_cards) == 1:
+            gain_card = valid_gain_cards[0]
+        else:
+            gain_cards = player.decider.gain_decision(
+                prompt="Gain a card costing up to $4: ",
+                buyable=self,
+                valid_cards=valid_gain_cards,
+                player=player,
+                game=game,
+                min_num_gain=1,
+                max_num_gain=1,
+            )
+            assert len(gain_cards) == 1
+            gain_card = gain_cards[0]
+            assert gain_card.get_cost(player, game) <= 4
+
+        player.gain(gain_card, game, destination=player.set_aside)
+
+        # register effect to play card on next turn
+        effect = Summon.PlayCardEffect(player, gain_card)
+        game.effect_registry.register_turn_start_effect(effect)
+
+
 black_market = BlackMarket()
 church = Church()
 dismantle = Dismantle()
@@ -730,6 +795,9 @@ sauna = Sauna()
 avanto = Avanto()
 stash = Stash()
 walled_village = WalledVillage()
+
+
+summon = Summon()
 
 
 promos_set = Expansion(
@@ -744,5 +812,8 @@ promos_set = Expansion(
         [avanto, sauna],
         stash,
         walled_village,
+    ],
+    [
+        summon,
     ],
 )

@@ -96,6 +96,7 @@ from pyminion.expansions.promos import (
     sauna,
     avanto,
     stash,
+    summon,
     walled_village,
 )
 from pyminion.game import Game
@@ -1347,6 +1348,15 @@ def test_stash_bot(multiplayer_bot_game: Game):
     for _ in range(10):
         bot.deck.shuffle()
         assert bot.deck.cards[-1].name == "Stash"
+
+
+def test_summon_bot(multiplayer_bot_game: Game):
+    bot = multiplayer_bot_game.players[0]
+    assert len(bot.set_aside) == 0
+
+    bot.state.money = 5
+    bot.buy(summon, multiplayer_bot_game)
+    assert len(bot.set_aside) == 1
 
 
 def test_walled_village_bot(multiplayer_bot_game: Game):
