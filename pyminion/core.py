@@ -145,6 +145,7 @@ class CardType(Enum):
     Attack = 5
     Reaction = 6
     Duration = 7
+    Command = 8
 
 
 class Card(Buyable):
