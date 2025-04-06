@@ -162,7 +162,7 @@ class Decider(Protocol):
     ) -> list["Card"]:
         raise NotImplementedError("name_card_decision is not implemented")
 
-    def multi_play_decision(
+    def play_decision(
         self,
         prompt: str,
         buyable: "Buyable",
@@ -171,7 +171,7 @@ class Decider(Protocol):
         game: "Game",
         required: bool = True,
     ) -> "Card|None":
-        raise NotImplementedError("multi_play_decision is not implemented")
+        raise NotImplementedError("play_decision is not implemented")
 
     def set_aside_decision(
         self,

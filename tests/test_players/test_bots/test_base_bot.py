@@ -182,8 +182,8 @@ def test_name_card_decision(base_bot: Bot, game: Game):
     assert cards[1].name == "Estate"
 
 
-def test_multi_play_decision(base_bot: Bot, game: Game):
-    card = base_bot.decider.multi_play_decision(
+def test_play_decision(base_bot: Bot, game: Game):
+    card = base_bot.decider.play_decision(
         prompt="",
         buyable=copper,
         valid_cards=[copper, estate, gold],
@@ -195,8 +195,8 @@ def test_multi_play_decision(base_bot: Bot, game: Game):
     assert card.name == "Copper"
 
 
-def test_multi_play_decision_none(base_bot: Bot, game: Game):
-    card = base_bot.decider.multi_play_decision(
+def test_play_decision_none(base_bot: Bot, game: Game):
+    card = base_bot.decider.play_decision(
         prompt="",
         buyable=copper,
         valid_cards=[copper, estate, gold],

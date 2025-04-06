@@ -204,7 +204,7 @@ class BotDecider:
     ) -> list[Card]:
         return valid_cards[:min_num_name]
 
-    def multi_play_decision(
+    def play_decision(
         self,
         prompt: str,
         buyable: Buyable,

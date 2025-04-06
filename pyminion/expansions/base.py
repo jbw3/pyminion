@@ -894,7 +894,7 @@ class ThroneRoom(Action):
         if not action_cards:
             return
 
-        dp_card = player.decider.multi_play_decision(
+        dp_card = player.decider.play_decision(
             prompt="You may play an action card from your hand twice: ",
             buyable=self,
             valid_cards=action_cards,

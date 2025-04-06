@@ -573,7 +573,7 @@ class HumanDecider:
         return result
 
     @validate_input(exceptions=InvalidSingleCardInput)
-    def multi_play_decision(
+    def play_decision(
         self,
         prompt: str,
         buyable: Buyable,

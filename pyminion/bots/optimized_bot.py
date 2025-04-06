@@ -510,7 +510,7 @@ class OptimizedBotDecider(BotDecider):
         else:
             return super().name_card_decision(prompt, buyable, valid_cards, player, game, min_num_name, max_num_name)
 
-    def multi_play_decision(
+    def play_decision(
         self,
         prompt: str,
         buyable: Buyable,
@@ -522,7 +522,7 @@ class OptimizedBotDecider(BotDecider):
         if buyable.name == "Throne Room":
             return self.throne_room(player=player, game=game, valid_cards=valid_cards)
         else:
-            return super().multi_play_decision(prompt, buyable, valid_cards, player, game, required)
+            return super().play_decision(prompt, buyable, valid_cards, player, game, required)
 
     def set_aside_decision(
         self,
