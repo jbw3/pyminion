@@ -125,6 +125,81 @@ class BlackMarket(Action):
         game.add_non_supply_pile(black_market_deck)
 
 
+class Captain(ActionDuration):
+    """
+    Now and at the start of your next turn: Play a non-Duration, non-Command
+    Action card from the Supply costing up to $4, leaving it there.
+
+    """
+
+    class PlayCardEffect(PlayerGameEffect):
+        def __init__(self, captain_card: "Captain", player: Player):
+            super().__init__(f"{captain_card.name}: Play card")
+            self.captain_card = captain_card
+            self.player = player
+
+        def get_action(self) -> EffectAction:
+            return EffectAction.PlayCard
+
+        def is_triggered(self, player: Player, game: "Game") -> bool:
+            return player is self.player
+
+        def handler(self, player: Player, game: "Game") -> None:
+            self.captain_card.play_card(player, game)
+
+            game.effect_registry.unregister_turn_start_effect(self.get_id())
+
+    def __init__(self):
+        super().__init__(
+            "Captain", 6, (CardType.Action, CardType.Duration, CardType.Command)
+        )
+
+    def duration_play(
+        self,
+        player: Player,
+        game: "Game",
+        multi_play_card: Card | None,
+        count: int,
+        generic_play: bool = True,
+    ) -> None:
+
+        Action.play(self, player, game, generic_play)
+
+        self.play_card(player, game)
+
+        play_card_effect = Captain.PlayCardEffect(self, player)
+        game.effect_registry.register_turn_start_effect(play_card_effect)
+
+        self.persist(player, game, multi_play_card, count)
+
+    def play_card(self, player: Player, game: "Game") -> None:
+        valid_cards = [
+            card
+            for card in game.supply.available_cards()
+            if CardType.Action in card.type
+            and CardType.Duration not in card.type
+            and CardType.Command not in card.type
+        ]
+
+        if len(valid_cards) == 0:
+            return
+        elif len(valid_cards) == 1:
+            play_card = valid_cards[0]
+        else:
+            play_card = player.decider.play_decision(
+                "Choose a non-Duration, non-Command Action card from the Supply: ",
+                self,
+                valid_cards,
+                player,
+                game,
+                required=True,
+            )
+            assert play_card is not None
+        assert isinstance(play_card, Action)
+
+        play_card.play(player, game, generic_play=False)
+
+
 class Church(ActionDuration):
     """
     +1 Action
@@ -786,6 +861,7 @@ class Summon(Event):
 
 
 black_market = BlackMarket()
+captain = Captain()
 church = Church()
 dismantle = Dismantle()
 envoy = Envoy()
@@ -804,6 +880,7 @@ promos_set = Expansion(
     "Promos",
     [
         black_market,
+        captain,
         church,
         dismantle,
         envoy,
